@@ -1,282 +1,301 @@
 module ivan.ifs3d.ifs3d;
 
-private
-{
-  import std.stream, std.cstream;
-  import std.stdio;
-  import glfw, freeimage;
-  import ivan.ifs3d.config;
-  import ivan.ifs3d.scene;
-  import ivan.ifs3d.transformation;
-  import ivan.ifs3d.keysstate;
+private {
+	import std.stream, std.cstream;
+	import std.stdio;
+	import glfw, freeimage;
+	import ivan.ifs3d.config;
+	import ivan.ifs3d.scene;
+	import ivan.ifs3d.transformation;
+	import ivan.ifs3d.keysstate;
 
-  import ivan.ifs3d.global; alias ivan.ifs3d.global global;
-  import ivan.ifs3d.callback; alias ivan.ifs3d.callback callback;
+	import ivan.ifs3d.global;
+
+	alias ivan.ifs3d.global global;
+
+	import ivan.ifs3d.callback;
+
+	alias ivan.ifs3d.callback callback;
 }
+
 import std.c.process;
 
-pragma(lib,"glfwdll.lib");
-pragma(lib,"opengl32.lib");
-pragma(lib,"glu32.lib");
-pragma(lib,"freeimage.lib");
+pragma(lib, "glfwdll.lib");
+pragma(lib, "opengl32.lib");
+pragma(lib, "glu32.lib");
+pragma(lib, "freeimage.lib");
 
-static this()
-{
-  debug writefln("ifs3d.static this()");
-  setCallbackDelegates();
+static this() {
+	debug
+		writefln("ifs3d.static this()");
+	setCallbackDelegates();
 }
 
-int main(string[] args)
-{
-  writefln("Welcome to ifs3d, 3D IFS simulator");
-  global.init();
-  global.conf.initGlfw();
+int main(string[] args) {
+	writefln("Welcome to ifs3d, 3D IFS simulator, v2.0.0");
+	global.init();
+	global.conf.initGlfw();
 
-  global.scene.addTr(new Transformation(0,0,0,2,2,2));
-  global.scene.addTr(new Transformation(0,0,0,1,1,1));
-  global.scene.addTr(new Transformation(1,0,0,1,1,1));
-  global.scene.addTr(new Transformation(1,1,0,1,1,1));
+	global.scene.addTr(new Transformation(0, 0, 0, 2, 2, 2));
+	global.scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
+	global.scene.addTr(new Transformation(1, 0, 0, 1, 1, 1));
+	global.scene.addTr(new Transformation(1, 1, 0, 1, 1, 1));
 
-  global.scene.updateTransformationMatrix();
-  
-  if(args.length == 2)
-  {
-    global.scene = new Scene(new std.stream.File(args[1],FileMode.In));
-  }
+	global.scene.updateTransformationMatrix();
 
-  global.loop.draw = 
-  {
-    if(clearscreen > 0)
-    {
-      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-      clearscreen --;
-    }
+	if(args.length == 2) {
+		global.scene = new Scene(new std.stream.File(args[1], FileMode.In));
+	}
 
-    global.conf.setOrtho();
-    //crtaj sučelje
+	global.loop.draw = {
+		if(clearscreen > 0) {
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			clearscreen--;
+		}
 
-    global.conf.setPerspective();
-    global.conf.setModelView();
-    //crtaj fraktal
+		global.conf.setOrtho();
+		//crtaj sučelje
 
-    scene.draw();
-    
-    if(conf.drawTransAndAxes == true)
-    {
-      scene.drawTrans(bgColor[0],bgColor[1],bgColor[2]);
+		global.conf.setPerspective();
+		global.conf.setModelView();
+		//crtaj fraktal
 
-      glBegin(GL_LINES);
-		glColor3f(1, 0, 0);
-        glVertex2f(0,0); glVertex2f(5,0);
-		glColor3f(0, 1, 0);
-        glVertex2f(0,0); glVertex2f(0,5);
-		glColor3f(0, 0, 1);
-        glVertex2f(0,0); glVertex3f(0,0,5);
-      glEnd();
-    }
+		scene.draw();
 
-    glfwSwapBuffers();
-    global.o.flush();
-    
-    processMouseEvents();
-  };
+		if(conf.drawTransAndAxes == true) {
+			scene.drawTrans(bgColor[0], bgColor[1], bgColor[2]);
 
-  global.conf.showWindow();
-  global.conf.registerCallbacks();  
+			glBegin(GL_LINES);
+			glColor3f(1, 0, 0);
+			glVertex2f(0, 0);
+			glVertex2f(5, 0);
+			glColor3f(0, 1, 0);
+			glVertex2f(0, 0);
+			glVertex2f(0, 5);
+			glColor3f(0, 0, 1);
+			glVertex2f(0, 0);
+			glVertex3f(0, 0, 5);
+			glEnd();
+		}
 
-  try
-  {
-    global.loop.start();
-  }
-  catch(Exception e)
-  {
-    global.o.writefln(e.msg);
-  }
+		glfwSwapBuffers();
+		global.o.flush();
 
-  global.consoleThread.terminate(true);
-  //Ovo više ne radi na D2
-  //global.o.writefln("Waiting for thread to terminate...");
-  //global.consoleThread.wait(1000);
+		processMouseEvents();
+	};
 
-  global.conf.terminateGlfw();
+	global.conf.showWindow();
+	global.conf.registerCallbacks();
 
-  return 0;
+	try {
+		global.loop.start();
+	} catch(Exception e) {
+		global.o.writefln(e.msg);
+	}
+
+	global.consoleThread.terminate(true);
+	//Ovo više ne radi na D2
+	//global.o.writefln("Waiting for thread to terminate...");
+	//global.consoleThread.wait(1000);
+
+	global.conf.terminateGlfw();
+
+	return 0;
 }
 
-void processMouseEvents()
-{
-  if(mouse.Left == true)
-  {
-    if(keys.lAlt == true)
-    {
-      scene.moveCameraLookAt(mouse.XDelta, mouse.YDelta);
-      conf.clrscr();
-    }
-    else
-    {
-      scene.moveSelectedTrans(mouse.XDelta, mouse.YDelta);
-      conf.clrscr();
-    }
-  }
+void processMouseEvents() {
+	if(mouse.Left == true) {
+		if(keys.lAlt == true) {
+			scene.moveCameraLookAt(mouse.XDelta, mouse.YDelta);
+			conf.clrscr();
+		} else {
+			scene.moveSelectedTrans(mouse.XDelta, mouse.YDelta);
+			conf.clrscr();
+		}
+	}
 
-  if(mouse.Right == true)
-  {
-    if(keys.lAlt == true)
-    {
-      scene.scaleSelectedTrans(mouse.XDelta,mouse.YDelta);
-      conf.clrscr();
-    }
-    else
-    if(keys.lCtrl == true)
-    {
-      scene.ZoomCamera(mouse.YDelta);
-      conf.clrscr();
-    }
-    else
-    {
-      scene.RotateOciste(mouse.XDelta,mouse.YDelta);
-      conf.clrscr();
-    }
-  }
-  
-  if(mouse.WheelDelta != 0)
-  {
-    scene.ZoomCamera(mouse.WheelDelta);
-    conf.clrscr();
-  }
+	if(mouse.Right == true) {
+		if(keys.lAlt == true) {
+			scene.scaleSelectedTrans(mouse.XDelta, mouse.YDelta);
+			conf.clrscr();
+		} else if(keys.lCtrl == true) {
+			scene.ZoomCamera(mouse.YDelta);
+			conf.clrscr();
+		} else {
+			scene.RotateOciste(mouse.XDelta, mouse.YDelta);
+			conf.clrscr();
+		}
+	}
 
-  if(keys.insert == true)
-  {
-    scene.addTr(new Transformation(0,0,0,1,1,1));
-    scene.selectedTrans = scene.transformations.length - 1;
-    scene.resetPos();
-    scene.updateTransformationMatrix();
-    glfwSleep(0.2);
-    conf.clrscr();
-  }
-  if(keys.del == true)
-  {
-    scene.deleteTransformation();
-    glfwSleep(0.2);
-    conf.clrscr();
-  }
-  
-  if(keys.Left == true)
-  {
-    scene.selectPrevTransformation;
-    glfwSleep(0.2);
-  }
-  if(keys.Right == true)
-  {
-    scene.selectNextTransformation;
-    glfwSleep(0.2);
-  }
+	if(mouse.WheelDelta != 0) {
+		scene.ZoomCamera(mouse.WheelDelta);
+		conf.clrscr();
+	}
 
-  void toZero(ref int val)
-  {
-    if(val < 0) val++;
-    else if(val > 0) val--;
-  }
+	if(keys.insert == true) {
+		scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
+		scene.selectedTrans = scene.transformations.length - 1;
+		scene.resetPos();
+		scene.updateTransformationMatrix();
+		glfwSleep(0.2);
+		conf.clrscr();
+	}
+	if(keys.del == true) {
+		scene.deleteTransformation();
+		glfwSleep(0.2);
+		conf.clrscr();
+	}
 
-  toZero(mouse.WheelDelta);
-  toZero(mouse.XDelta);
-  toZero(mouse.YDelta);
+	if(keys.Left == true) {
+		scene.selectPrevTransformation;
+		glfwSleep(0.2);
+	}
+	if(keys.Right == true) {
+		scene.selectNextTransformation;
+		glfwSleep(0.2);
+	}
+
+	void toZero(ref int val) {
+		if(val < 0)
+			val++;
+		else if(val > 0)
+			val--;
+	}
+
+	toZero(mouse.WheelDelta);
+	toZero(mouse.XDelta);
+	toZero(mouse.YDelta);
 }
 
-void setCallbackDelegates()
-{
-  debug writefln("void setCallbackDelegates()");
+void setCallbackDelegates() {
+	debug
+		writefln("void setCallbackDelegates()");
 
-  callback.windowResize = (int w, int h)
-  {
-    debug global.o.writefln("Resizing to: (", w, ",", h, ")");
-    global.conf.setIntParam("resX", w);
-    global.conf.setIntParam("resY", h);
-    glViewport( 0, 0, w, h );
-    conf.clrscr();
-  };
+	callback.windowResize = (int w, int h) {
+		debug
+			global.o.writefln("Resizing to: (", w, ",", h, ")");
+		global.conf.setIntParam("resX", w);
+		global.conf.setIntParam("resY", h);
+		glViewport(0, 0, w, h);
+		conf.clrscr();
+	};
 
-  callback.mouseWheel = (int pos) 
-  {
-    debug global.o.writefln("Mouse scroll: ", pos);
-    mouse.WheelDelta = pos - mouse.WheelPos;
-    mouse.WheelPos = pos;
-  };
+	callback.mouseWheel = (int pos) {
+		debug
+			global.o.writefln("Mouse scroll: ", pos);
+		mouse.WheelDelta = pos - mouse.WheelPos;
+		mouse.WheelPos = pos;
+	};
 
-  callback.mousePos = (int x, int y)
-  {
-    debug global.o.writefln("Mouse pos: ", x, ", ", y);
-    mouse.XDelta = x - mouse.X;
-    mouse.YDelta = y - mouse.Y;
-    debug global.o.writefln("Mouse delta: ", mouse.XDelta, ", ", mouse.YDelta);
-    mouse.X = x;
-    mouse.Y = y;
-  };
+	callback.mousePos = (int x, int y) {
+		debug
+			global.o.writefln("Mouse pos: ", x, ", ", y);
+		mouse.XDelta = x - mouse.X;
+		mouse.YDelta = y - mouse.Y;
+		debug
+			global.o.writefln("Mouse delta: ", mouse.XDelta, ", ", mouse.YDelta);
+		mouse.X = x;
+		mouse.Y = y;
+	};
 
-  callback.mouseButton = (int button, int action)
-  {
-    debug global.o.writefln("Mouse button: ", button, ", ", action);
+	callback.mouseButton = (int button, int action) {
+		debug
+			global.o.writefln("Mouse button: ", button, ", ", action);
 
-    mouse.LeftOld = mouse.Left;
-    mouse.RightOld = mouse.Right;
-    mouse.MiddleOld = mouse.Middle;
-    
-    if(action == GLFW_PRESS)
-    {
-      if(button == GLFW_MOUSE_BUTTON_LEFT) mouse.Left = true;
-      if(button == GLFW_MOUSE_BUTTON_RIGHT) mouse.Right = true;
-      if(button == GLFW_MOUSE_BUTTON_MIDDLE) mouse.Middle = true;
-    }
-    else
-    {
-      if(button == GLFW_MOUSE_BUTTON_LEFT) mouse.Left = false;
-      if(button == GLFW_MOUSE_BUTTON_RIGHT) mouse.Right = false;
-      if(button == GLFW_MOUSE_BUTTON_MIDDLE) mouse.Middle = false;
-    }
-  };
+		mouse.LeftOld = mouse.Left;
+		mouse.RightOld = mouse.Right;
+		mouse.MiddleOld = mouse.Middle;
 
-  callback.keyCallback = (int key, int action)
-  {
-    debug global.o.writefln("Key: ", key, ", ", action);
-    keys.update(key, action);
-  };
+		if(action == GLFW_PRESS) {
+			if(button == GLFW_MOUSE_BUTTON_LEFT)
+				mouse.Left = true;
+			if(button == GLFW_MOUSE_BUTTON_RIGHT)
+				mouse.Right = true;
+			if(button == GLFW_MOUSE_BUTTON_MIDDLE)
+				mouse.Middle = true;
+		} else {
+			if(button == GLFW_MOUSE_BUTTON_LEFT)
+				mouse.Left = false;
+			if(button == GLFW_MOUSE_BUTTON_RIGHT)
+				mouse.Right = false;
+			if(button == GLFW_MOUSE_BUTTON_MIDDLE)
+				mouse.Middle = false;
+		}
+	};
 
-  callback.characterCallback = (int character, int state)
-  {
-    debug global.o.writefln("Character: ", character, ", ", state);
-    char c = cast(char)character;
-    if(state == GLFW_PRESS)
-    {
-      switch(c)
-      {
-        case 'a': scene.changeFunctionOfSelected(-1); conf.clrscr(); break;
-        case 'd': scene.changeFunctionOfSelected(1); conf.clrscr(); break;
-        case '.': scene.printPoint ^= true; break;
-        case 's': scene.save(conf.nextFileCounter); break;
-        case 'q': scene.rotateSelected(-1); conf.clrscr(); break;
-        case 'w': scene.rotateSelected(1); conf.clrscr(); break;
-        case 'e': scene.setRotVectorOfSelected(); conf.clrscr(); break;
-        case 'r': scene.resetPos(); break;
-        case 't': conf.drawTransAndAxes ^= true; conf.clrscr(); break;
-        case 'b': 
-        {
-          debug global.o.writefln("Character == ", c);
+	callback.keyCallback = (int key, int action) {
+		debug
+			global.o.writefln("Key: ", key, ", ", action);
+		keys.update(key, action);
+	};
 
-          if(bgColor is bgColorWhite)bgColor = bgColorBlack;
-          else if(bgColor is bgColorBlack)bgColor = bgColorWhite;
-          else bgColor = bgColorWhite;
+	callback.characterCallback = (int character, int state) {
+		debug
+			global.o.writefln("Character: ", character, ", ", state);
+		char c = cast(char) character;
+		if(state == GLFW_PRESS) {
+			switch(c) {
+				case 'a':
+					scene.changeFunctionOfSelected(-1);
+					conf.clrscr();
+				break;
+				case 'd':
+					scene.changeFunctionOfSelected(1);
+					conf.clrscr();
+				break;
+				case '.':
+					scene.printPoint ^= true;
+				break;
+				case 's':
+					scene.save(conf.nextFileCounter);
+				break;
+				case 'q':
+					scene.rotateSelected(-1);
+					conf.clrscr();
+				break;
+				case 'w':
+					scene.rotateSelected(1);
+					conf.clrscr();
+				break;
+				case 'e':
+					scene.setRotVectorOfSelected();
+					conf.clrscr();
+				break;
+				case 'r':
+					scene.resetPos();
+				break;
+				case 't':
+					conf.drawTransAndAxes ^= true;
+					conf.clrscr();
+				break;
+				case 'b': {
+					debug
+						global.o.writefln("Character == ", c);
 
-          glClearColor(bgColor[0], bgColor[1], bgColor[2], 0.0f);
-          conf.clrscr();
-          global.scene.clearImageBufferToBackgroundColor();
-          break;
-        }
-        case '+': scene.increaseStack(); break;
-        case '-': scene.decreaseStack(); break;
-        default: break;
-      }
-    }
-  };
+					if(bgColor is bgColorWhite)
+						bgColor = bgColorBlack;
+					else if(bgColor is bgColorBlack)
+						bgColor = bgColorWhite;
+					else
+						bgColor = bgColorWhite;
 
-  debug writefln("~void setCallbackDelegates()");
+					glClearColor(bgColor[0], bgColor[1], bgColor[2], 0.0f);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
+					break;
+				}
+				case '+':
+					scene.increaseStack();
+				break;
+				case '-':
+					scene.decreaseStack();
+				break;
+				default:
+				break;
+			}
+		}
+	};
+
+	debug
+		writefln("~void setCallbackDelegates()");
 }

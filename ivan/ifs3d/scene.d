@@ -1,530 +1,524 @@
 ﻿module ivan.ifs3d.scene;
 
-private 
-{
-  import glfw, freeimage;
-  import std.math;
-  import std.random;
-  import ivan.ifs3d.point;
-  import ivan.ifs3d.transformation;
-  import std.stdio;
-  import std.stream, std.cstream;
-  import ivan.ifs3d.writetga;
-  import ivan.ifs3d.config;
+private {
+	import glfw, freeimage;
+	import std.math;
+	import std.random;
+	import ivan.ifs3d.point;
+	import ivan.ifs3d.transformation;
+	import std.stdio;
+	import std.stream, std.cstream;
+	import ivan.ifs3d.writetga;
+	import ivan.ifs3d.config;
 }
 
 version = display_list;
 
-class Scene
-{
-  this()
-  {
-    cameraPosition = Point(0.5,3,10);
-    cameraLookAt = Point(0,0,0);
-    int w = global.conf.getIntParam("picResX");
-    int h = global.conf.getIntParam("picResY");
-    buffer = FreeImage_Allocate(w, h, 24);
-    zBuffer = new float[][](w, h);
-    clearImageBufferToBackgroundColor;
-  }
+class Scene {
+	this() {
+		cameraPosition = Point(0.5, 3, 10);
+		cameraLookAt = Point(0, 0, 0);
+		int w = global.conf.getIntParam("picResX");
+		int h = global.conf.getIntParam("picResY");
+		buffer = FreeImage_Allocate(w, h, 24);
+		zBuffer = new float[][](w, h);
+		clearImageBufferToBackgroundColor;
+	}
 
-  this(Stream s)
-  {
-    this();
-    int count;
-    s.readf(&count);
-    s.readf(&cameraPosition.x, &cameraPosition.y, &cameraPosition.z);
-    s.readf(&cameraLookAt.x, &cameraLookAt.y, &cameraLookAt.z);
+	this(Stream s) {
+		this();
+		int count;
+		s.readf(&count);
+		s.readf(&cameraPosition.x, &cameraPosition.y, &cameraPosition.z);
+		s.readf(&cameraLookAt.x, &cameraLookAt.y, &cameraLookAt.z);
 
-    for(int i=0; i<count; i++)
-    {
-      this.addTr(new Transformation(s));
-    }
-    debug
-    {
-      writeln(cameraPosition.toString, cameraLookAt.toString);
-      writeln(count, " transformations");
-      foreach(Transformation t; transformations)
-      {
-        t.toStreamNice(dout);
-      }
-    }
-    this.updateTransformationMatrix();
-    this.recalculateVolume();
-  }
-
-  void toStream(Stream s)
-  {
-    s.writefln(transformations.length);
-    s.writefln("%s %s %s", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-    s.writefln("%s %s %s", cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
-    foreach(t; transformations)
-    {
-      t.toStream(s);
-    }
-  }
-
-  void draw()
-  {
-    static short lastTr = 0;
-    
-    glPointSize(5);
-    glBegin(GL_POINTS);
-      glColor3f(1,1,1);
-      glVertex3f(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
-    glEnd();
-    glPointSize(1);
-    
-    ubyte getColor(int index)
-    {
-      int suma = 0;
-      //real mult = 1.0;
-      for(int i=moveStack.length-1; i>=0; i--)
-      {
-        suma += cast(int)(colors[(moveStack[i])%colors.length][index]/**mult*/);
-      }
-      return cast(ubyte)(suma/moveStack.length);
-    }
-
-    short nlRand()
-    {
-		//TODO proučiti da li je ovaj rand ok!
-		real randNum = (std.random.uniform(0, 10000) % (transformationVolumeSum));
-		real counter = 0;
-		for(long index=1; index<transformations.length; index++)
-		{
-			counter += abs(transformations[cast(int)index].area);
-			if(randNum < counter) return cast(short)index;
+		for(int i = 0; i < count; i++) {
+			this.addTr(new Transformation(s));
 		}
-		return 0;
-    }
+		debug {
+			writeln(cameraPosition.toString, cameraLookAt.toString);
+			writeln(count, " transformations");
+			foreach(Transformation t; transformations) {
+				t.toStreamNice(dout);
+			}
+		}
+		this.updateTransformationMatrix();
+		this.recalculateVolume();
+	}
 
-    void drawDisplayList() 
-    {
-      for(int i=0; i<POINTS_PER_ITERATION; i++)
-      {
-        colorBuffer[i][0] = getColor(0);
-        colorBuffer[i][1] = getColor(1);
-        colorBuffer[i][2] = getColor(2);
+	void toStream(Stream s) {
+		s.writefln(transformations.length);
+		s.writefln("%s %s %s", cameraPosition.x, cameraPosition.y,
+				cameraPosition.z);
+		s.writefln("%s %s %s", cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
+		foreach(t; transformations) {
+			t.toStream(s);
+		}
+	}
 
-        positions[i][0] = x;
-        positions[i][1] = y;
-        positions[i][2] = z;
+	void draw() {
+		static short lastTr = 0;
 
-        synchronized(this)transformations[lastTr = nlRand()].transformPoint( x, y, z);
+		glPointSize(5);
+		glBegin(GL_POINTS);
+		glColor3f(1, 1, 1);
+		glVertex3f(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
+		glEnd();
+		glPointSize(1);
 
-        synchronized(this)
-        {
-          for(int k=1; k<moveStack.length; k++)
-  			  {
-  				  moveStack[k-1] = moveStack[k];
-  			  }
-    			moveStack[moveStack.length-1] = lastTr;
-        }
-      }
+		ubyte getColor(int index) {
+			int suma = 0;
+			//real mult = 1.0;
+			for(int i = moveStack.length - 1; i >= 0; i--) {
+				suma += cast(int) (colors[(moveStack[i]) % colors.length][index]/**mult*/);
+			}
+			return cast(ubyte) (suma / moveStack.length);
+		}
 
-      glEnableClientState(GL_VERTEX_ARRAY);
-		  glEnableClientState(GL_COLOR_ARRAY);
-      glVertexPointer(3, GL_FLOAT, 0, positions.ptr);
-      glColorPointer(3, GL_UNSIGNED_BYTE, 0, colorBuffer.ptr);
-      glDrawArrays(GL_POINTS, 0, positions.length/3);
-    }
+		short nlRand() {
+			//TODO proučiti da li je ovaj rand ok!
+			real
+					randNum = (std.random.uniform(0, 10000) % (transformationVolumeSum));
+			real counter = 0;
+			for(long index = 1; index < transformations.length; index++) {
+				counter += abs(transformations[cast(int) index].area);
+				if(randNum < counter)
+					return cast(short) index;
+			}
+			return 0;
+		}
 
-    glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR, feedbackBuffer.ptr);
-    glRenderMode(GL_FEEDBACK);
-    drawDisplayList();
+		void drawDisplayList() {
+			for(int i = 0; i < POINTS_PER_ITERATION; i++) {
+				colorBuffer[i][0] = getColor(0);
+				colorBuffer[i][1] = getColor(1);
+				colorBuffer[i][2] = getColor(2);
 
-    int size = glRenderMode(GL_RENDER);
+				positions[i][0] = x;
+				positions[i][1] = y;
+				positions[i][2] = z;
 
-    float mx = cast(float)global.conf.getIntParam("picResX")/global.conf.getIntParam("resX");
-    float my = cast(float)global.conf.getIntParam("picResY")/global.conf.getIntParam("resY");
-    for(int i=0; i<size; i+=8)
-    {
-      //feedback buffer content:
-      //  0   1 2 3 4 5 6 7
-      //token x y z r g b a
-      uint x = cast(uint)(feedbackBuffer[i+1]/*feedbackBuffer[i+3]*/*mx);
-      uint y = cast(uint)(feedbackBuffer[i+2]/*feedbackBuffer[i+3]*/*my);
-      //if(x>100&&x<150)global.o.writefln(" =======================> Z = ", feedbackBuffer[i+3]);
-      if(x>=0 && x<zBuffer.length && y>0 && y<zBuffer[0].length)
-      {
-        if(feedbackBuffer[i+3] < zBuffer[x][y]) 
-        {
-          zBuffer[x][y] = feedbackBuffer[i+3];
-          FreeImage_SetPixelColor(buffer, x, y, 
-            ivan.ifs3d.writetga.getColor(
-              cast(ubyte)(feedbackBuffer[i+6]*255),
-              cast(ubyte)(feedbackBuffer[i+5]*255), 
-              cast(ubyte)(feedbackBuffer[i+4]*255)));
-        }
-      }
-    }
+				synchronized(this)
+					transformations[lastTr = nlRand()].transformPoint(x, y, z);
 
-    version(display_list)
-    {
-      drawDisplayList();
-    }
-    else
-    {
-      glBegin(GL_POINTS);
-      for(int i=0; i<POINTS_PER_ITERATION; i++)
-      {
-        glColor3ub(getColor(0), getColor(1), getColor(2));
-        glVertex3f(x,y,z);
-        synchronized(this)transformations[lastTr = nlRand()].transformPoint( x, y, z);
-        //synchronized(this)transformations[lastTr = rand()%(transformations.length-1)+1].transformPoint( x, y, z);
-        
-        if(printPoint == true) writefln("(%s %s %s)",x,y,z);
-        
-        synchronized(this)
-        {
-          for(int k=1; k<moveStack.length; k++)
-          {
-            moveStack[k-1] = moveStack[k];
-          }
-          moveStack[moveStack.length-1] = lastTr;
-        }
-      }
-      glEnd();
-    }
-  }
+				synchronized(this) {
+					for(int k = 1; k < moveStack.length; k++) {
+						moveStack[k - 1] = moveStack[k];
+					}
+					moveStack[moveStack.length - 1] = lastTr;
+				}
+			}
 
-  void clearImageBufferToBackgroundColor()
-  {
-    int w = global.conf.getIntParam("picResX");
-    int h = global.conf.getIntParam("picResY");
-    for(uint y=0; y<h; y++)
-    {
-      for(uint x=0; x<w; x++)
-      {
-        FreeImage_SetPixelColor(buffer, x, y, getColor(global.bgColor[2], global.bgColor[1], global.bgColor[0]));
-      }
-    }
-    foreach(ref line; zBuffer)foreach(ref elem; line) elem = 100;
-  }
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glEnableClientState(GL_COLOR_ARRAY);
+			glVertexPointer(3, GL_FLOAT, 0, positions.ptr);
+			glColorPointer(3, GL_UNSIGNED_BYTE, 0, colorBuffer.ptr);
+			glDrawArrays(GL_POINTS, 0, positions.length / 3);
+		}
 
-  public void increaseStack()
-  {
-    debug writef("inc stack: ");
-    synchronized(this) moveStack.length = moveStack.length + 1;
-    debug writeln(moveStack.length);
-  }
+		glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR, feedbackBuffer.ptr);
+		glRenderMode(GL_FEEDBACK);
+		drawDisplayList();
 
-  public void decreaseStack()
-  {
-    debug writef("dec stack: ");
-    int size = moveStack.length - 1;
-    if(size > 0)
-    {
-      synchronized(this) moveStack.length = size;
-    }
-    debug writeln(moveStack.length);
-  }
+		int size = glRenderMode(GL_RENDER);
 
-  void addTr(Transformation t)
-  {
-    transformations ~= t;
-    this.recalculateVolume();
-  }
+		float
+				mx = cast(float) global.conf.getIntParam("picResX") / global.conf.getIntParam(
+						"resX");
+		float
+				my = cast(float) global.conf.getIntParam("picResY") / global.conf.getIntParam(
+						"resY");
+		for(int i = 0; i < size; i += 8) {
+			//feedback buffer content:
+			//  0   1 2 3 4 5 6 7
+			//token x y z r g b a
+			uint
+					x = cast(uint) (feedbackBuffer[i + 1]/*feedbackBuffer[i+3]*/* mx);
+			uint
+					y = cast(uint) (feedbackBuffer[i + 2]/*feedbackBuffer[i+3]*/* my);
+			//if(x>100&&x<150)global.o.writefln(" =======================> Z = ", feedbackBuffer[i+3]);
+			if(x >= 0 && x < zBuffer.length && y > 0 && y < zBuffer[0].length) {
+				if(feedbackBuffer[i + 3] < zBuffer[x][y]) {
+					zBuffer[x][y] = feedbackBuffer[i + 3];
+					FreeImage_SetPixelColor(buffer, x, y,
+							ivan.ifs3d.writetga.getColor(
+									cast(ubyte) (feedbackBuffer[i + 6] * 255),
+									cast(ubyte) (feedbackBuffer[i + 5] * 255),
+									cast(ubyte) (feedbackBuffer[i + 4] * 255)));
+				}
+			}
+		}
 
-  public void setRotVectorOfSelected()
-  {
-    real vx = cameraPosition.x - cameraLookAt.x;
-    real vy = cameraPosition.y - cameraLookAt.y;
-    real vz = cameraPosition.z - cameraLookAt.z;
+		version(display_list) {
+			drawDisplayList();
+		} else {
+			glBegin(GL_POINTS);
+			for(int i = 0; i < POINTS_PER_ITERATION; i++) {
+				glColor3ub(getColor(0), getColor(1), getColor(2));
+				glVertex3f(x, y, z);
+				synchronized(this)
+					transformations[lastTr = nlRand()].transformPoint(x, y, z);
+				//synchronized(this)transformations[lastTr = rand()%(transformations.length-1)+1].transformPoint( x, y, z);
 
-    real len = sqrt(vx*vx + vy*vy + vz*vz);
-    vx /= len;
-    vy /= len;
-    vz /= len;
+				if(printPoint == true)
+					writefln("(%s %s %s)", x, y, z);
 
-    transformations[selectedTrans].Rx = vx;
-    transformations[selectedTrans].Ry = vy;
-    transformations[selectedTrans].Rz = vz;
+				synchronized(this) {
+					for(int k = 1; k < moveStack.length; k++) {
+						moveStack[k - 1] = moveStack[k];
+					}
+					moveStack[moveStack.length - 1] = lastTr;
+				}
+			}
+			glEnd();
+		}
+	}
 
-    if(selectedTrans == 0)
-    {
-      this.updateTransformationMatrix();
-    }
-    else
-    {
-      transformations[selectedTrans].CalculateTransformationMatrix2(transformations[0]);
-    }
-  }
-  
-  public void ZoomCamera(int mouseYDelta)
-  {
-    debug writefln(cameraPosition.toString, " ", cameraLookAt.toString, " ", mouseYDelta);
-    real vx = cameraPosition.x - cameraLookAt.x;
-    real vy = cameraPosition.y - cameraLookAt.y;
-    real vz = cameraPosition.z - cameraLookAt.z;
+	void clearImageBufferToBackgroundColor() {
+		int w = global.conf.getIntParam("picResX");
+		int h = global.conf.getIntParam("picResY");
+		for(uint y = 0; y < h; y++) {
+			for(uint x = 0; x < w; x++) {
+				FreeImage_SetPixelColor(buffer, x, y,
+						getColor(global.bgColor[2], global.bgColor[1],
+								global.bgColor[0]));
+			}
+		}
+		foreach(ref line; zBuffer)
+			foreach(ref elem; line)
+				elem = 100;
+	}
 
-    real div = mouseYDelta>0 ? 1.1f : 1/1.1f;
-    if(mouseYDelta == 0) div = 1;
+	public void increaseStack() {
+		debug
+			writef("inc stack: ");
+		synchronized(this)
+			moveStack.length = moveStack.length + 1;
+		debug
+			writeln(moveStack.length);
+	}
 
-    vx *= div;
-    vy *= div;
-    vz *= div;
+	public void decreaseStack() {
+		debug
+			writef("dec stack: ");
+		int size = moveStack.length - 1;
+		if(size > 0) {
+			synchronized(this)
+				moveStack.length = size;
+		}
+		debug
+			writeln(moveStack.length);
+	}
 
-    cameraPosition.x = vx + cameraLookAt.x;
-    cameraPosition.y = vy + cameraLookAt.y;
-    cameraPosition.z = vz + cameraLookAt.z;
-  }
+	void addTr(Transformation t) {
+		transformations ~= t;
+		this.recalculateVolume();
+	}
 
-  public void moveCameraLookAt(int mouseXDelta, int mouseYDelta)
-  {
-    real vx = cameraPosition.x - cameraLookAt.x;
-    real vy = cameraPosition.y - cameraLookAt.y;
-    real vz = cameraPosition.z - cameraLookAt.z;
+	public void setRotVectorOfSelected() {
+		real vx = cameraPosition.x - cameraLookAt.x;
+		real vy = cameraPosition.y - cameraLookAt.y;
+		real vz = cameraPosition.z - cameraLookAt.z;
 
-    real len = sqrt(vx*vx + vy*vy + vz*vz);
-    vx /= len;
-    vy /= len;
-    vz /= len;
+		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		vx /= len;
+		vy /= len;
+		vz /= len;
 
-    cameraLookAt.x += vz * mouseXDelta/100f;
-    cameraLookAt.y += -1 * mouseYDelta/100f;
-    cameraLookAt.z += -vx * mouseXDelta/100f;
-  }
-  
-  public void RotateOciste(int mouseXDelta, int mouseYDelta)
-  {
-    real vx = cameraPosition.x - cameraLookAt.x;
-    real vy = cameraPosition.y - cameraLookAt.y;
-    real vz = cameraPosition.z - cameraLookAt.z;
+		transformations[selectedTrans].Rx = vx;
+		transformations[selectedTrans].Ry = vy;
+		transformations[selectedTrans].Rz = vz;
 
-    real len = sqrt(vx*vx + vy*vy + vz*vz);
-    vx /= len;
-    vy /= len;
-    vz /= len;
+		if(selectedTrans == 0) {
+			this.updateTransformationMatrix();
+		} else {
+			transformations[selectedTrans].CalculateTransformationMatrix2(
+					transformations[0]);
+		}
+	}
 
-    real[][] M = Transformation.MakeRotationMatrix(mouseXDelta/200f,0,1,0);
-    ivan.ifs3d.transformation.Transformation.transformPoint(this.cameraPosition.x, this.cameraPosition.y, this.cameraPosition.z, M);
-    M = Transformation.MakeRotationMatrix(mouseYDelta/200f,vz,0,-vx);
-    ivan.ifs3d.transformation.Transformation.transformPoint(cameraPosition.x, cameraPosition.y, cameraPosition.z, M);
-  }
-  
-  public void scaleSelectedTrans(real dx, real dy)
-  {
-    real vx = cameraPosition.x - cameraLookAt.x;
-    real vy = cameraPosition.y - cameraLookAt.y;
-    real vz = cameraPosition.z - cameraLookAt.z;
-    real len = sqrt(vx*vx + vy*vy + vz*vz);
-    vx /= len;
-    vy /= len;
-    vz /= len;
+	public void ZoomCamera(int mouseYDelta) {
+		debug
+			writefln(cameraPosition.toString, " ", cameraLookAt.toString, " ",
+					mouseYDelta);
+		real vx = cameraPosition.x - cameraLookAt.x;
+		real vy = cameraPosition.y - cameraLookAt.y;
+		real vz = cameraPosition.z - cameraLookAt.z;
 
-    transformations[selectedTrans].Wx = transformations[selectedTrans].Wx + vz*dx*len/1000f;
-    transformations[selectedTrans].Wy = transformations[selectedTrans].Wy - dy*len/1000f;
-    transformations[selectedTrans].Wz = transformations[selectedTrans].Wz - dx*vx*len/1000f;
+		real div = mouseYDelta > 0 ? 1.1f : 1 / 1.1f;
+		if(mouseYDelta == 0)
+			div = 1;
 
-    if(selectedTrans == 0)
-    {
-      this.updateTransformationMatrix();
-    }
-    else
-    {
-      transformations[selectedTrans].CalculateTransformationMatrix2(transformations[0]);
-    }
-    this.recalculateVolume();
-  }
-  
-  public void moveSelectedTrans(real dx, real dy)
-  {
-    real vx = cameraPosition.x - cameraLookAt.x;
-    real vy = cameraPosition.y - cameraLookAt.y;
-    real vz = cameraPosition.z - cameraLookAt.z;
-    real len = sqrt(vx*vx + vy*vy + vz*vz);
-    vx /= len;
-    vy /= len;
-    vz /= len;
+		vx *= div;
+		vy *= div;
+		vz *= div;
 
-    transformations[selectedTrans].X = transformations[selectedTrans].X + len*dx*vz/1000f;
-    transformations[selectedTrans].Y = transformations[selectedTrans].Y - len*dy*(vx*vx+vz*vz)/1000f;
-    transformations[selectedTrans].Z = transformations[selectedTrans].Z + len*dx*-vx/1000f;
-    
-    transformations[selectedTrans].X = transformations[selectedTrans].X + len*dy*-vx*vy/1000f;
-    transformations[selectedTrans].Y = transformations[selectedTrans].Y - len*dy*(vx*vx+vz*vz)/1000f;
-    transformations[selectedTrans].Z = transformations[selectedTrans].Z + len*dy*-vy*vz/1000f;
+		cameraPosition.x = vx + cameraLookAt.x;
+		cameraPosition.y = vy + cameraLookAt.y;
+		cameraPosition.z = vz + cameraLookAt.z;
+	}
 
-    if(selectedTrans == 0)
-    {
-      this.updateTransformationMatrix();
-    }
-    else
-    {
-      transformations[selectedTrans].CalculateTransformationMatrix2(transformations[0]);
-    }
-    this.recalculateVolume();
-  }
+	public void moveCameraLookAt(int mouseXDelta, int mouseYDelta) {
+		real vx = cameraPosition.x - cameraLookAt.x;
+		real vy = cameraPosition.y - cameraLookAt.y;
+		real vz = cameraPosition.z - cameraLookAt.z;
 
-  void updateTransformationMatrix()
-  {
-    for(int i=0; i<transformations.length; i++)
-    {
-      transformations[i].CalculateTransformationMatrix2(transformations[0]);
-    }
-  }
+		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		vx /= len;
+		vy /= len;
+		vz /= len;
 
-  void drawTrans(real r, real g, real b)
-  {
-    foreach(int i, t; transformations) 
-    {
-      if(i != selectedTrans) t.draw(1-r,1-g,1-b);
-    }
-    transformations[selectedTrans].draw(255,255,0);
-  }
-  
-  void selectNextTransformation(){ selectedTrans = (selectedTrans+1)%transformations.length; }
-  void selectPrevTransformation()
-  {
-    selectedTrans--;  
-    if(selectedTrans < 0)
-    {
-      selectedTrans += transformations.length;
-    }
-  }
-  void deleteTransformation()
-  {
-    Transformation[] novi;
-    for(int i=0; i<transformations.length; i++)
-    {
-      if(i != selectedTrans)
-      novi ~= transformations[i];
-    }
+		cameraLookAt.x += vz * mouseXDelta / 100f;
+		cameraLookAt.y += -1 * mouseYDelta / 100f;
+		cameraLookAt.z += -vx * mouseXDelta / 100f;
+	}
 
-    selectedTrans--;
-    if(selectedTrans<0)selectedTrans=0;
-    
-    synchronized(this)
-    {
-      transformations = novi;
-      if(selectedTrans == 0)
-      {
-        this.updateTransformationMatrix();
-      }
-      else
-      {
-        transformations[selectedTrans].CalculateTransformationMatrix2(transformations[0]);
-      }
-    }
-    moveStack[] = 0;
-    this.recalculateVolume();
-  }
-  void rotateSelected(int sign)
-  {
-    transformations[selectedTrans].Ra = sign*PI/32 + transformations[selectedTrans].Ra;
-    if(selectedTrans == 0)
-    {
-      this.updateTransformationMatrix();
-    }
-    else
-    {
-      transformations[selectedTrans].CalculateTransformationMatrix2(transformations[0]);
-    }
-    this.recalculateVolume();
-  }
-  void changeFunctionOfSelected(int direction)
-  {
-    int f = transformations[selectedTrans].func;
-    f += direction;
-    if(f < 0) f+= Transformation.numberOfFunc;
-    else f %= Transformation.numberOfFunc;
-    transformations[selectedTrans].func = f;
-  }
+	public void RotateOciste(int mouseXDelta, int mouseYDelta) {
+		real vx = cameraPosition.x - cameraLookAt.x;
+		real vy = cameraPosition.y - cameraLookAt.y;
+		real vz = cameraPosition.z - cameraLookAt.z;
 
-  void saveImage(string fileName)
-  {
-    glFinish();
-    ivan.ifs3d.writetga.writeJpeg(fileName);
-  }
+		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		vx /= len;
+		vy /= len;
+		vz /= len;
 
-  void save(int n)
-  {
-    string definition     = std.string.format("fractal%05d.ifs3d",n);
-    string picture        = std.string.format("fractal%05d.jpeg",n);
-    string pictureHighres = std.string.format("fractal%05d-highres.jpeg",n);
-    string pictureBicubic = std.string.format("fractal%05d-bicubic.jpeg",n);
-    
-    global.o.writefln("Saving scene definition file..."); global.o.flush();
-    this.toStream(new std.stream.File(definition, FileMode.Out));
+		real[][] M = Transformation.MakeRotationMatrix(mouseXDelta / 200f, 0,
+				1, 0);
+		ivan.ifs3d.transformation.Transformation.transformPoint(
+				this.cameraPosition.x, this.cameraPosition.y,
+				this.cameraPosition.z, M);
+		M = Transformation.MakeRotationMatrix(mouseYDelta / 200f, vz, 0, -vx);
+		ivan.ifs3d.transformation.Transformation.transformPoint(
+				cameraPosition.x, cameraPosition.y, cameraPosition.z, M);
+	}
 
-    global.o.writef(
-      std.string.format("Saving high res (%sx%s) image...",
-        global.conf.getIntParam("picResX"),
-        global.conf.getIntParam("picResY")));
-    global.o.flush();
-    FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, buffer, cast(char*)pictureHighres, JPEG_QUALITYSUPERB);
-    global.o.writefln(" done");
+	public void scaleSelectedTrans(real dx, real dy) {
+		real vx = cameraPosition.x - cameraLookAt.x;
+		real vy = cameraPosition.y - cameraLookAt.y;
+		real vz = cameraPosition.z - cameraLookAt.z;
+		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		vx /= len;
+		vy /= len;
+		vz /= len;
 
-    FIBITMAP* pict32bit = FreeImage_ConvertTo32Bits(buffer);
-    FreeImage_AdjustGamma(pict32bit, (global.conf.getIntParam("adjGamma")+100)/20);
-    FreeImage_AdjustBrightness(pict32bit, global.conf.getIntParam("adjBrightness"));
-    FreeImage_AdjustContrast(pict32bit, global.conf.getIntParam("adjContrast"));
-    FIBITMAP* nova = FreeImage_Rescale(pict32bit, 
-      global.conf.getIntParam("picSmallX"), 
-      global.conf.getIntParam("picSmallY"), 
-      FREE_IMAGE_FILTER.FILTER_BICUBIC);
-    FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(nova);
-    global.o.writef(
-      std.string.format("Saving resampled (%sx%s) image...",
-        global.conf.getIntParam("picSmallX"),
-        global.conf.getIntParam("picSmallY")));
-    global.o.flush();
-    FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG,nova24bit,cast(char*)pictureBicubic,JPEG_QUALITYSUPERB);
-    global.o.writefln(" done");
-    FreeImage_Unload(nova);
-    FreeImage_Unload(nova24bit);
-    FreeImage_Unload(pict32bit);
+		transformations[selectedTrans].Wx = transformations[selectedTrans].Wx + vz * dx * len / 1000f;
+		transformations[selectedTrans].Wy = transformations[selectedTrans].Wy - dy * len / 1000f;
+		transformations[selectedTrans].Wz = transformations[selectedTrans].Wz - dx * vx * len / 1000f;
 
-    global.o.writef("Saving screen capture image..."); global.o.flush();
-    saveImage(picture);
-    global.o.writefln(" done");
-  }
+		if(selectedTrans == 0) {
+			this.updateTransformationMatrix();
+		} else {
+			transformations[selectedTrans].CalculateTransformationMatrix2(
+					transformations[0]);
+		}
+		this.recalculateVolume();
+	}
 
-  void resetPos(){x=0; y=0; z=0;}
+	public void moveSelectedTrans(real dx, real dy) {
+		real vx = cameraPosition.x - cameraLookAt.x;
+		real vy = cameraPosition.y - cameraLookAt.y;
+		real vz = cameraPosition.z - cameraLookAt.z;
+		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		vx /= len;
+		vy /= len;
+		vz /= len;
 
-  package int selectedTrans = 0;
-  package Transformation[] transformations;
-  private real transformationVolumeSum = 0;
-  void recalculateVolume()
-  {
-    transformationVolumeSum = 0;
-    foreach(int index, rect; transformations)
-		{
-			if(index!=0)
-			{
+		transformations[selectedTrans].X = transformations[selectedTrans].X + len * dx * vz / 1000f;
+		transformations[selectedTrans].Y = transformations[selectedTrans].Y - len * dy * (vx * vx + vz * vz) / 1000f;
+		transformations[selectedTrans].Z = transformations[selectedTrans].Z + len * dx * -vx / 1000f;
+
+		transformations[selectedTrans].X = transformations[selectedTrans].X + len * dy * -vx * vy / 1000f;
+		transformations[selectedTrans].Y = transformations[selectedTrans].Y - len * dy * (vx * vx + vz * vz) / 1000f;
+		transformations[selectedTrans].Z = transformations[selectedTrans].Z + len * dy * -vy * vz / 1000f;
+
+		if(selectedTrans == 0) {
+			this.updateTransformationMatrix();
+		} else {
+			transformations[selectedTrans].CalculateTransformationMatrix2(
+					transformations[0]);
+		}
+		this.recalculateVolume();
+	}
+
+	void updateTransformationMatrix() {
+		for(int i = 0; i < transformations.length; i++) {
+			transformations[i].CalculateTransformationMatrix2(
+					transformations[0]);
+		}
+	}
+
+	void drawTrans(real r, real g, real b) {
+		foreach(int i, t; transformations) {
+			if(i != selectedTrans)
+				t.draw(1 - r, 1 - g, 1 - b);
+		}
+		transformations[selectedTrans].draw(255, 255, 0);
+	}
+
+	void selectNextTransformation() {
+		selectedTrans = (selectedTrans + 1) % transformations.length;
+	}
+
+	void selectPrevTransformation() {
+		selectedTrans--;
+		if(selectedTrans < 0) {
+			selectedTrans += transformations.length;
+		}
+	}
+
+	void deleteTransformation() {
+		Transformation[] novi;
+		for(int i = 0; i < transformations.length; i++) {
+			if(i != selectedTrans)
+				novi ~= transformations[i];
+		}
+
+		selectedTrans--;
+		if(selectedTrans < 0)
+			selectedTrans = 0;
+
+		synchronized(this) {
+			transformations = novi;
+			if(selectedTrans == 0) {
+				this.updateTransformationMatrix();
+			} else {
+				transformations[selectedTrans].CalculateTransformationMatrix2(
+						transformations[0]);
+			}
+		}
+		moveStack[] = 0;
+		this.recalculateVolume();
+	}
+
+	void rotateSelected(int sign) {
+		transformations[selectedTrans].Ra = sign * PI / 32 + transformations[selectedTrans].Ra;
+		if(selectedTrans == 0) {
+			this.updateTransformationMatrix();
+		} else {
+			transformations[selectedTrans].CalculateTransformationMatrix2(
+					transformations[0]);
+		}
+		this.recalculateVolume();
+	}
+
+	void changeFunctionOfSelected(int direction) {
+		int f = transformations[selectedTrans].func;
+		f += direction;
+		if(f < 0)
+			f += Transformation.numberOfFunc;
+		else
+			f %= Transformation.numberOfFunc;
+		transformations[selectedTrans].func = f;
+	}
+
+	void saveImage(string fileName) {
+		glFinish();
+		ivan.ifs3d.writetga.writeJpeg(fileName);
+	}
+
+	void save(int n) {
+		string definition = std.string.format("fractal%05d.ifs3d", n);
+		string picture = std.string.format("fractal%05d.jpeg", n);
+		string
+				pictureHighres = std.string.format("fractal%05d-highres.jpeg",
+						n);
+		string
+				pictureBicubic = std.string.format("fractal%05d-bicubic.jpeg",
+						n);
+
+		global.o.writefln("Saving scene definition file...");
+		global.o.flush();
+		this.toStream(new std.stream.File(definition, FileMode.Out));
+
+		global.o.writef(std.string.format("Saving high res (%sx%s) image...",
+				global.conf.getIntParam("picResX"), global.conf.getIntParam(
+						"picResY")));
+		global.o.flush();
+		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, buffer,
+				cast(char*) pictureHighres, JPEG_QUALITYSUPERB);
+		global.o.writefln(" done");
+
+		FIBITMAP* pict32bit = FreeImage_ConvertTo32Bits(buffer);
+		FreeImage_AdjustGamma(pict32bit,
+				(global.conf.getIntParam("adjGamma") + 100) / 20);
+		FreeImage_AdjustBrightness(pict32bit, global.conf.getIntParam(
+				"adjBrightness"));
+		FreeImage_AdjustContrast(pict32bit, global.conf.getIntParam(
+				"adjContrast"));
+		FIBITMAP* nova = FreeImage_Rescale(pict32bit, global.conf.getIntParam(
+				"picSmallX"), global.conf.getIntParam("picSmallY"),
+				FREE_IMAGE_FILTER.FILTER_BICUBIC);
+		FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(nova);
+		global.o.writef(std.string.format("Saving resampled (%sx%s) image...",
+				global.conf.getIntParam("picSmallX"), global.conf.getIntParam(
+						"picSmallY")));
+		global.o.flush();
+		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
+				cast(char*) pictureBicubic, JPEG_QUALITYSUPERB);
+		global.o.writefln(" done");
+		FreeImage_Unload(nova);
+		FreeImage_Unload(nova24bit);
+		FreeImage_Unload(pict32bit);
+
+		global.o.writef("Saving screen capture image...");
+		global.o.flush();
+		saveImage(picture);
+		global.o.writefln(" done");
+	}
+
+	void resetPos() {
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+
+	package int selectedTrans = 0;
+	package Transformation[] transformations;
+	private real transformationVolumeSum = 0;
+
+	void recalculateVolume() {
+		transformationVolumeSum = 0;
+		foreach(int index, rect; transformations) {
+			if(index != 0) {
 				transformationVolumeSum += abs(rect.area);
 			}
 		}
-  }
+	}
 
-  package Point cameraPosition;
-  package Point cameraLookAt;
+	package Point cameraPosition;
+	package Point cameraLookAt;
 
-  package real x=0, y=0, z=0;
-  package bool printPoint = false;
+	package real x = 0, y = 0, z = 0;
+	package bool printPoint = false;
 
-  private ubyte[][] colors =
-  [[125,125,125], [255,000,000], [000,255,000], [000,000,255], [255,255,000],
-   [000,255,255], [255,000,255], [255,255,255], [100,155,255], [155,000,055],
-  ];
+	private ubyte[][] colors = [
+		[125, 125, 125],
+		[255, 000, 000],
+		[000, 255, 000],
+		[000, 000, 255],
+		[255, 255, 000],
+		[000, 255, 255],
+		[255, 000, 255],
+		[255, 255, 255],
+		[100, 155, 255],
+		[155, 000, 055]
+	, ];
 
-  const int POINTS_PER_ITERATION = 10000;
+	const int POINTS_PER_ITERATION = 10000;
 
-  FIBITMAP* buffer;
-  float[][] zBuffer;
+	FIBITMAP* buffer;
+	float[][] zBuffer;
 
-  static float[3][] positions;
-  static ubyte[3][] colorBuffer;
-  static short[] moveStack;
-  static float[] feedbackBuffer;
+	static float[3][] positions;
+	static ubyte[3][] colorBuffer;
+	static short[] moveStack;
+	static float[] feedbackBuffer;
 
-  static this()
-  {
-    positions.length = POINTS_PER_ITERATION;
-    colorBuffer.length = POINTS_PER_ITERATION;
-    feedbackBuffer.length = POINTS_PER_ITERATION*8; //token x y z r g b a;
-    moveStack.length = 2;
-  }
+	static this() {
+		positions.length = POINTS_PER_ITERATION;
+		colorBuffer.length = POINTS_PER_ITERATION;
+		feedbackBuffer.length = POINTS_PER_ITERATION * 8; //token x y z r g b a;
+		moveStack.length = 2;
+	}
 }
