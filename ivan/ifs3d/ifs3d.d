@@ -94,7 +94,7 @@ int main(string[] args) {
 
 void processMouseEvents() {
 	if(mouse.Left == true) {
-		if(keys.lAlt == true) {
+		if(keys.lShift == true) {
 			scene.moveCameraLookAt(mouse.XDelta, mouse.YDelta);
 			conf.clrscr();
 		} else {
