@@ -353,7 +353,9 @@ class Scene {
 			if(i != selectedTrans)
 				t.draw(1 - r, 1 - g, 1 - b);
 		}
+		glLineWidth(2);
 		transformations[selectedTrans].draw(255, 255, 0);
+		glLineWidth(1);
 	}
 
 	void drawCoordinateSystem() {

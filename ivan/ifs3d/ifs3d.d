@@ -138,10 +138,12 @@ void processMouseEvents() {
 	if(keys.Left == true) {
 		scene.selectPrevTransformation;
 		glfwSleep(0.2);
+		conf.clrscr();
 	}
 	if(keys.Right == true) {
 		scene.selectNextTransformation;
 		glfwSleep(0.2);
+		conf.clrscr();
 	}
 
 	void toZero(ref int val) {

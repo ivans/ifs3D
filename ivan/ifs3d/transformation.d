@@ -88,7 +88,6 @@ class Transformation {
 						transform(X, Y + Wy, Z + Wz));
 
 		glColor3f(r, g, b);
-		glLineWidth(1);
 		glBegin(GL_LINE_LOOP);
 		glVertex3f(tocke[0][0], tocke[0][1], tocke[0][2]);
 		glVertex3f(tocke[1][0], tocke[1][1], tocke[1][2]);
