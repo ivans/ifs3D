@@ -78,8 +78,11 @@ class Config {
 		FreeImage_Initialise();
 		auto freeImgVersion = FreeImage_GetVersion();
 		auto freeImgCopyright = FreeImage_GetCopyrightMessage();
+		uint len1 = std.c.string.strlen(freeImgVersion);
+		uint len2 = std.c.string.strlen(freeImgCopyright);
 
-		writefln("%s\n%s", freeImgVersion, freeImgCopyright);
+		writefln("FreeImage version: %s\nFreeImage copyright: %s",
+				freeImgVersion[0 .. len1], freeImgCopyright[0 .. len2]);
 	}
 
 	void initGlfw() {
