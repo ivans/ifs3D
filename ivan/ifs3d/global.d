@@ -29,7 +29,7 @@ alias std.cstream.dout o;
 static this() {
 	debug
 		o.writefln("global.static this()");
-	bgColor = bgColorWhite;
+	bgColor = bgColorBlack;
 }
 
 void init() {

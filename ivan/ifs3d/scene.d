@@ -12,8 +12,6 @@ private {
 	import ivan.ifs3d.config;
 }
 
-version = display_list;
-
 class Scene {
 	this() {
 		cameraPosition = Point(0.5, 3, 10);
@@ -59,6 +57,7 @@ class Scene {
 	void draw() {
 		static short lastTr = 0;
 
+		//nacrtaj očište kamere (bijela točka)
 		glPointSize(5);
 		glBegin(GL_POINTS);
 		glColor3f(1, 1, 1);
@@ -148,30 +147,8 @@ class Scene {
 				}
 			}
 		}
-
-		version(display_list) {
-			drawDisplayList();
-		} else {
-			glBegin(GL_POINTS);
-			for(int i = 0; i < POINTS_PER_ITERATION; i++) {
-				glColor3ub(getColor(0), getColor(1), getColor(2));
-				glVertex3f(x, y, z);
-				synchronized(this)
-					transformations[lastTr = nlRand()].transformPoint(x, y, z);
-				//synchronized(this)transformations[lastTr = rand()%(transformations.length-1)+1].transformPoint( x, y, z);
-
-				if(printPoint == true)
-					writefln("(%s %s %s)", x, y, z);
-
-				synchronized(this) {
-					for(int k = 1; k < moveStack.length; k++) {
-						moveStack[k - 1] = moveStack[k];
-					}
-					moveStack[moveStack.length - 1] = lastTr;
-				}
-			}
-			glEnd();
-		}
+		
+		drawDisplayList();
 	}
 
 	void clearImageBufferToBackgroundColor() {
