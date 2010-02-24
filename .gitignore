@@ -2,3 +2,5 @@
 *.map
 *.obj
 ifs3d_init.txt
+*.jpeg
+*.ifs3d
