@@ -356,6 +356,20 @@ class Scene {
 		transformations[selectedTrans].draw(255, 255, 0);
 	}
 
+	void drawCoordinateSystem() {
+		glBegin(GL_LINES);
+		glColor3f(1, 0, 0);
+		glVertex2f(0, 0);
+		glVertex2f(5, 0);
+		glColor3f(0, 1, 0);
+		glVertex2f(0, 0);
+		glVertex2f(0, 5);
+		glColor3f(0, 0, 1);
+		glVertex2f(0, 0);
+		glVertex3f(0, 0, 5);
+		glEnd();
+	}
+
 	void selectNextTransformation() {
 		selectedTrans = (selectedTrans + 1) % transformations.length;
 	}
