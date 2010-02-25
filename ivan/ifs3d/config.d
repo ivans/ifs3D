@@ -93,6 +93,12 @@ class Config {
 		int v1, v2, v3;
 		glfwGetVersion(&v1, &v2, &v3);
 		writefln("Using glfw version; %s.%s.%s", v1, v2, v3);
+
+		writefln("GL_RENDERER   = %s", cast(char*) glGetString(GL_RENDERER));
+		writefln("GL_VERSION    = %s", cast(char*) glGetString(GL_VERSION));
+		writefln("GL_VENDOR     = %s", cast(char*) glGetString(GL_VENDOR));
+		writefln("GL_EXTENSIONS = %s", cast(char*) glGetString(GL_EXTENSIONS));
+
 		glfwGetDesktopMode(&desktopMode);
 	}
 
