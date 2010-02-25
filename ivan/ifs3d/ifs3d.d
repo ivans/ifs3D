@@ -21,7 +21,6 @@ private {
 import std.c.process;
 
 pragma(lib, "glfwdll.lib");
-pragma(lib, "glfw.lib");
 pragma(lib, "opengl32.lib");
 pragma(lib, "glu32.lib");
 pragma(lib, "freeimage.lib");
