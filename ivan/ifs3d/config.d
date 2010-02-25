@@ -40,7 +40,6 @@ class Config {
 		intParams["adjContrast"] = 0;
 		intParams["adjBrightness"] = 0;
 		intParams["adjGamma"] = -80;
-
 	}
 
 	void saveConfigFile(string fileName) {
@@ -65,7 +64,7 @@ class Config {
 	void printParams(Stream s) {
 		foreach(key, value; intParams) {
 			if(key != "") {
-				s.writefln("%s %d", key, value);
+				s.writefln("\t%s=%d", key, value);
 			}
 		}
 	}

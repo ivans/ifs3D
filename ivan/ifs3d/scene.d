@@ -54,16 +54,26 @@ class Scene {
 		}
 	}
 
-	void draw() {
-		static short lastTr = 0;
-
-		//nacrtaj očište kamere (bijela točka)
+	void drawOciste() {
 		glPointSize(5);
 		glBegin(GL_POINTS);
 		glColor3f(1, 1, 1);
 		glVertex3f(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
 		glEnd();
 		glPointSize(1);
+	}
+
+	void draw() {
+
+		debug
+			writefln("drawing...");
+
+		bool drawToFeedbackBuffer = true;
+
+		static short lastTr = 0;
+
+		//nacrtaj očište kamere (bijela točka)
+		drawOciste();
 
 		ubyte getColor(int index) {
 			int suma = 0;
@@ -115,39 +125,47 @@ class Scene {
 			glDrawArrays(GL_POINTS, 0, positions.length / 3);
 		}
 
-		glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR, feedbackBuffer.ptr);
-		glRenderMode(GL_FEEDBACK);
-		drawDisplayList();
+		if(drawToFeedbackBuffer) {
+			glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR,
+					feedbackBuffer.ptr);
+			glRenderMode(GL_FEEDBACK);
+			drawDisplayList();
+		}
 
 		int size = glRenderMode(GL_RENDER);
 
-		float
-				mx = cast(float) global.conf.getIntParam("picResX") / global.conf.getIntParam(
-						"resX");
-		float
-				my = cast(float) global.conf.getIntParam("picResY") / global.conf.getIntParam(
-						"resY");
-		for(int i = 0; i < size; i += 8) {
-			//feedback buffer content:
-			//  0   1 2 3 4 5 6 7
-			//token x y z r g b a
-			uint
-					x = cast(uint) (feedbackBuffer[i + 1]/*feedbackBuffer[i+3]*/* mx);
-			uint
-					y = cast(uint) (feedbackBuffer[i + 2]/*feedbackBuffer[i+3]*/* my);
-			//if(x>100&&x<150)global.o.writefln(" =======================> Z = ", feedbackBuffer[i+3]);
-			if(x >= 0 && x < zBuffer.length && y > 0 && y < zBuffer[0].length) {
-				if(feedbackBuffer[i + 3] < zBuffer[x][y]) {
-					zBuffer[x][y] = feedbackBuffer[i + 3];
-					FreeImage_SetPixelColor(buffer, x, y,
-							ivan.ifs3d.writetga.getColor(
-									cast(ubyte) (feedbackBuffer[i + 6] * 255),
-									cast(ubyte) (feedbackBuffer[i + 5] * 255),
-									cast(ubyte) (feedbackBuffer[i + 4] * 255)));
+		if(drawToFeedbackBuffer) {
+			float
+					mx = cast(float) global.conf.getIntParam("picResX") / global.conf.getIntParam(
+							"resX");
+			float
+					my = cast(float) global.conf.getIntParam("picResY") / global.conf.getIntParam(
+							"resY");
+			for(int i = 0; i < size; i += 8) {
+				//feedback buffer content:
+				//  0   1 2 3 4 5 6 7
+				//token x y z r g b a
+				uint
+						x = cast(uint) (feedbackBuffer[i + 1]/*feedbackBuffer[i+3]*/* mx);
+				uint
+						y = cast(uint) (feedbackBuffer[i + 2]/*feedbackBuffer[i+3]*/* my);
+				//if(x>100&&x<150)global.o.writefln(" =======================> Z = ", feedbackBuffer[i+3]);
+				if(x >= 0 && x < zBuffer.length && y > 0 && y < zBuffer[0].length) {
+					if(feedbackBuffer[i + 3] < zBuffer[x][y]) {
+						zBuffer[x][y] = feedbackBuffer[i + 3];
+						FreeImage_SetPixelColor(
+								buffer,
+								x,
+								y,
+								ivan.ifs3d.writetga.getColor(
+										cast(ubyte) (feedbackBuffer[i + 6] * 255),
+										cast(ubyte) (feedbackBuffer[i + 5] * 255),
+										cast(ubyte) (feedbackBuffer[i + 4] * 255)));
+					}
 				}
 			}
 		}
-		
+
 		drawDisplayList();
 	}
 

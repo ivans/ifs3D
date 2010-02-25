@@ -15,12 +15,14 @@ class GameLoop {
 	}
 
 	public void delegate() draw;
+
 	private double time = 0.0;
 	public double t0 = 0.0, fps;
 	int frames = 0;
 	bool running = true;
 
 	void calculateFps() {
+		time = glfwGetTime();
 		if((time - t0) > 1.0 || frames == 0) {
 			fps = cast(double) frames / (time - t0);
 			t0 = time;
@@ -34,7 +36,6 @@ class GameLoop {
 
 	void start() {
 		while(running) {
-			time = glfwGetTime();
 			calculateFps();
 			glfwGetMousePos(&global.mouse.X, &global.mouse.Y);
 			draw();
