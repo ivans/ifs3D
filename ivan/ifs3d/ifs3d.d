@@ -37,21 +37,11 @@ int main(string[] args) {
 	global.conf.initGlfw();
 
 	void testExtension(string name) {
-		writefln("glfwExtensionSupported:%s %s",
-				name, glfwExtensionSupported(cast(char*) std.string.toStringz(name)));
-		
-	}
-	
-	testExtension("GL_ARB_shader_objects");
-	testExtension("GL_EXT_framebuffer_object");
-	testExtension("EXT_vertex_array");
+		writefln("glfwExtensionSupported:%s %s", name, glfwExtensionSupported(
+				cast(char*) std.string.toStringz(name)));
 
-	int x = 3;
-	
-	void* glCompileShader = glfwGetProcAddress(cast(char*)"glCompileShader");
-	writefln("Pointer to func = %s", glCompileShader);
-	
-	
+	}
+
 	global.scene.addTr(new Transformation(0, 0, 0, 2, 2, 2));
 	global.scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
 	global.scene.addTr(new Transformation(1, 0, 0, 1, 1, 1));
@@ -91,6 +81,33 @@ int main(string[] args) {
 
 	global.conf.showWindow();
 	global.conf.registerCallbacks();
+
+	testExtension("GL_ARB_shader_objects");
+	testExtension("GL_EXT_framebuffer_object");
+	testExtension("EXT_vertex_array");
+
+	//int x = 3;
+
+	void* glCompileShader = glfwGetProcAddress(cast(char*) "glCompileShader");
+	writefln("Pointer to func = %s", glCompileShader);
+
+	auto glRenderer = cast(char*) glGetString(GL_RENDERER);
+	auto glVersion = cast(char*) glGetString(GL_VERSION);
+	auto glVendor = cast(char*) glGetString(GL_VENDOR);
+	auto glExtensions = cast(char*) glGetString(GL_EXTENSIONS);
+
+	writefln("GL_RENDERER   = %s", glRenderer[0 .. std.c.string.strlen(
+			glRenderer)]);
+	writefln("GL_VERSION    = %s",
+			glVersion[0 .. std.c.string.strlen(glVersion)]);
+	writefln("GL_VENDOR     = %s", glVendor[0 .. std.c.string.strlen(glVendor)]);
+	writefln("GL_EXTENSIONS = %s", glExtensions[0 .. std.c.string.strlen(
+			glExtensions)]);
+	writefln("Error = %s", glGetError());
+
+	writeln([GL_INVALID_ENUM, GL_INVALID_VALUE, GL_INVALID_OPERATION,
+			GL_STACK_OVERFLOW, GL_STACK_UNDERFLOW, GL_OUT_OF_MEMORY,
+			GL_TABLE_TOO_LARGE]);
 
 	try {
 		global.loop.start();
