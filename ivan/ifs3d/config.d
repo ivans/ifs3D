@@ -90,6 +90,9 @@ class Config {
 			global.o.writefln("Init GLFW and get current desktop mode...");
 		InitFreeImage();
 		glfwInit();
+		int v1, v2, v3;
+		glfwGetVersion(&v1, &v2, &v3);
+		writefln("Using glfw version; %s.%s.%s", v1, v2, v3);
 		glfwGetDesktopMode(&desktopMode);
 	}
 

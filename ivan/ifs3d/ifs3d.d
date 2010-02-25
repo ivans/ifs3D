@@ -21,6 +21,7 @@ private {
 import std.c.process;
 
 pragma(lib, "glfwdll.lib");
+pragma(lib, "glfw.lib");
 pragma(lib, "opengl32.lib");
 pragma(lib, "glu32.lib");
 pragma(lib, "freeimage.lib");
@@ -36,6 +37,22 @@ int main(string[] args) {
 	global.init();
 	global.conf.initGlfw();
 
+	void testExtension(string name) {
+		writefln("glfwExtensionSupported:%s %s",
+				name, glfwExtensionSupported(cast(char*) std.string.toStringz(name)));
+		
+	}
+	
+	testExtension("GL_ARB_shader_objects");
+	testExtension("GL_EXT_framebuffer_object");
+	testExtension("EXT_vertex_array");
+
+	int x = 3;
+	
+	void* glCompileShader = glfwGetProcAddress(cast(char*)"glCompileShader");
+	writefln("Pointer to func = %s", glCompileShader);
+	
+	
 	global.scene.addTr(new Transformation(0, 0, 0, 2, 2, 2));
 	global.scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
 	global.scene.addTr(new Transformation(1, 0, 0, 1, 1, 1));
