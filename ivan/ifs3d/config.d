@@ -1,15 +1,17 @@
 module ivan.ifs3d.config;
 
 private {
-	import std.stream;
+	import std.stream, std.string;
 	import std.file;
 	import std.conv;
 	import std.stdio;
+
 	import ivan.ifs3d.callback;
 	import ivan.ifs3d.global;
 
 	alias ivan.ifs3d.global global;
 
+	import gl3 = ivan.ifs3d.gl3;
 	import glfw;
 	import freeimage;
 }
@@ -93,6 +95,52 @@ class Config {
 		glfwGetVersion(&v1, &v2, &v3);
 		writefln("Using glfw version; %s.%s.%s", v1, v2, v3);
 		glfwGetDesktopMode(&desktopMode);
+	}
+
+	private int testExtension(string name) {
+		int ret = glfwExtensionSupported(cast(char*) toStringz(name));
+		writefln("glfwExtensionSupported: %s = %s", name, ret);
+		return ret;
+	}
+
+	void initGlExtensionMethods() {
+		if(testExtension("GL_ARB_vertex_shader") == 1 && testExtension(
+				"GL_ARB_fragment_shader") == 1) {
+			debug
+				writefln(
+						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+
+			mixin(gl3.getMethodPointer("glCreateShader"));
+			mixin(gl3.getMethodPointer("glShaderSource"));
+			mixin(gl3.getMethodPointer("glCompileShader"));
+
+			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
+
+			GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+
+			string
+					shaderSrc = "
+		void main(void)
+		{
+			vec4 v = vec4(gl_Vertex);		
+			v.z = 0.0;
+			
+			gl_Position = gl_ModelViewProjectionMatrix * v;
+		}";
+
+			writefln("Shader = %s, with source = %s", shader, shaderSrc);
+
+			char* src = cast(char*) &shaderSrc[0];
+
+			gl3.glShaderSource(shader, 1, &src, null);
+			gl3.glCompileShader(shader);
+			writeln("After shader source i compile");
+		} else {
+			debug
+				writefln(
+						"Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+		}
+
 	}
 
 	void registerCallbacks() {

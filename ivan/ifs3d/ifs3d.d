@@ -9,7 +9,6 @@ private {
 	import ivan.ifs3d.transformation;
 	import ivan.ifs3d.keysstate;
 	import ivan.ifs3d.global;
-	import gl3 = ivan.ifs3d.gl3;
 
 	alias ivan.ifs3d.global global;
 
@@ -35,12 +34,6 @@ int main(string[] args) {
 	writefln("Welcome to ifs3d, 3D IFS simulator, v2.0.0");
 	global.init();
 	global.conf.initGlfw();
-
-	int testExtension(string name) {
-		int ret = glfwExtensionSupported(cast(char*) toStringz(name));
-		writefln("glfwExtensionSupported: %s = %s", name, ret);
-		return ret;
-	}
 
 	global.scene.addTr(new Transformation(0, 0, 0, 2, 2, 2));
 	global.scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
@@ -81,47 +74,7 @@ int main(string[] args) {
 
 	global.conf.showWindow();
 	global.conf.registerCallbacks();
-
-	if(testExtension("GL_ARB_vertex_shader") == 1 && testExtension(
-			"GL_ARB_fragment_shader") == 1) {
-		debug
-			writefln("Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
-
-		mixin(gl3.getMethodPointer("glCreateShader"));
-		mixin(gl3.getMethodPointer("glShaderSource"));
-		mixin(gl3.getMethodPointer("glCompileShader"));
-
-		//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
-
-		GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
-
-		string
-				shaderSrc = "
-			void main(void)
-			{
-				vec4 v = vec4(gl_Vertex);		
-				v.z = 0.0;
-				
-				gl_Position = gl_ModelViewProjectionMatrix * v;
-			}";
-
-		writefln("Shader = %s, with source = %s", shader, shaderSrc);
-
-		char* src = cast(char*) &shaderSrc[0];
-
-		gl3.glShaderSource(shader, 1, &src, null);
-		gl3.glCompileShader(shader);
-		writeln("After shader source i compile");
-	} else {
-		debug
-			writefln("Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
-	}
-
-	//int x = 3;
-
-	void* glCompileShader = glfwGetProcAddress(cast(char*) toStringz(
-			"glCompileShader"));
-	writefln("Pointer to func = %s", glCompileShader);
+	global.conf.initGlExtensionMethods();
 
 	auto glRenderer = cast(char*) glGetString(GL_RENDERER);
 	auto glVersion = cast(char*) glGetString(GL_VERSION);
