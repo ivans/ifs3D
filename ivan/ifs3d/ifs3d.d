@@ -2,14 +2,14 @@ module ivan.ifs3d.ifs3d;
 
 private {
 	import std.stream, std.cstream;
-	import std.stdio;
+	import std.stdio, std.string;
 	import glfw, freeimage;
 	import ivan.ifs3d.config;
 	import ivan.ifs3d.scene;
 	import ivan.ifs3d.transformation;
 	import ivan.ifs3d.keysstate;
-
 	import ivan.ifs3d.global;
+	import gl3 = ivan.ifs3d.gl3;
 
 	alias ivan.ifs3d.global global;
 
@@ -36,10 +36,10 @@ int main(string[] args) {
 	global.init();
 	global.conf.initGlfw();
 
-	void testExtension(string name) {
-		writefln("glfwExtensionSupported:%s %s", name, glfwExtensionSupported(
-				cast(char*) std.string.toStringz(name)));
-
+	int testExtension(string name) {
+		int ret = glfwExtensionSupported(cast(char*) toStringz(name));
+		writefln("glfwExtensionSupported: %s = %s", name, ret);
+		return ret;
 	}
 
 	global.scene.addTr(new Transformation(0, 0, 0, 2, 2, 2));
@@ -82,13 +82,41 @@ int main(string[] args) {
 	global.conf.showWindow();
 	global.conf.registerCallbacks();
 
-	testExtension("GL_ARB_shader_objects");
-	testExtension("GL_EXT_framebuffer_object");
-	testExtension("EXT_vertex_array");
+	if(testExtension("GL_ARB_vertex_shader") == 1 && testExtension(
+			"GL_ARB_fragment_shader") == 1) {
+		debug
+			writefln("Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+
+		mixin(gl3.getMethodPointer("glCreateShader"));
+		mixin(gl3.getMethodPointer("glShaderSource"));
+
+		GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+
+		string
+				shaderSrc = "
+			void main(void)
+			{
+				vec4 v = vec4(gl_Vertex);		
+				v.z = 0.0;
+				
+				gl_Position = gl_ModelViewProjectionMatrix * v;
+			}";
+
+		writefln("Shader = %s, with source = %s", shader, shaderSrc);
+		
+		char* src = cast(char*)&shaderSrc[0];
+		
+		gl3.glShaderSource(shader, 1, &src, null);
+		writeln("After shader source");
+	} else {
+		debug
+			writefln("Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+	}
 
 	//int x = 3;
 
-	void* glCompileShader = glfwGetProcAddress(cast(char*) "glCompileShader");
+	void* glCompileShader = glfwGetProcAddress(cast(char*) toStringz(
+			"glCompileShader"));
 	writefln("Pointer to func = %s", glCompileShader);
 
 	auto glRenderer = cast(char*) glGetString(GL_RENDERER);
@@ -103,11 +131,6 @@ int main(string[] args) {
 	writefln("GL_VENDOR     = %s", glVendor[0 .. std.c.string.strlen(glVendor)]);
 	writefln("GL_EXTENSIONS = %s", glExtensions[0 .. std.c.string.strlen(
 			glExtensions)]);
-	writefln("Error = %s", glGetError());
-
-	writeln([GL_INVALID_ENUM, GL_INVALID_VALUE, GL_INVALID_OPERATION,
-			GL_STACK_OVERFLOW, GL_STACK_UNDERFLOW, GL_OUT_OF_MEMORY,
-			GL_TABLE_TOO_LARGE]);
 
 	try {
 		global.loop.start();

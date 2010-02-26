@@ -65,9 +65,6 @@ class Scene {
 
 	void draw() {
 
-		debug
-			writefln("drawing...");
-
 		bool drawToFeedbackBuffer = true;
 
 		static short lastTr = 0;
