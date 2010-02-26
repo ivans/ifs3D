@@ -263,3 +263,5 @@ extern(System):
 
 	GLvoid function(GLuint shader, int numOfStrings, const char** strings, int* lenOfStrings)
 			glShaderSource;
+
+	GLvoid function(GLuint shader) glCompileShader;

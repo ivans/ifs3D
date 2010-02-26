@@ -89,6 +89,9 @@ int main(string[] args) {
 
 		mixin(gl3.getMethodPointer("glCreateShader"));
 		mixin(gl3.getMethodPointer("glShaderSource"));
+		mixin(gl3.getMethodPointer("glCompileShader"));
+
+		//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
 
 		GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
 
@@ -103,11 +106,12 @@ int main(string[] args) {
 			}";
 
 		writefln("Shader = %s, with source = %s", shader, shaderSrc);
-		
-		char* src = cast(char*)&shaderSrc[0];
-		
+
+		char* src = cast(char*) &shaderSrc[0];
+
 		gl3.glShaderSource(shader, 1, &src, null);
-		writeln("After shader source");
+		gl3.glCompileShader(shader);
+		writeln("After shader source i compile");
 	} else {
 		debug
 			writefln("Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
