@@ -65,7 +65,10 @@ class Scene {
 
 	void draw() {
 
-		bool drawToFeedbackBuffer = true;
+		debug
+			write(".");
+
+		bool drawToFeedbackBuffer = false;
 
 		static short lastTr = 0;
 
@@ -123,6 +126,8 @@ class Scene {
 		}
 
 		if(drawToFeedbackBuffer) {
+			debug
+				write(":");
 			glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR,
 					feedbackBuffer.ptr);
 			glRenderMode(GL_FEEDBACK);
@@ -132,6 +137,8 @@ class Scene {
 		int size = glRenderMode(GL_RENDER);
 
 		if(drawToFeedbackBuffer) {
+			debug
+				write(";");
 			float
 					mx = cast(float) global.conf.getIntParam("picResX") / global.conf.getIntParam(
 							"resX");
@@ -162,8 +169,11 @@ class Scene {
 				}
 			}
 		}
-
+		debug
+			write("-");
 		drawDisplayList();
+		debug
+			writeln("_");
 	}
 
 	void clearImageBufferToBackgroundColor() {
@@ -426,6 +436,8 @@ class Scene {
 	}
 
 	void save(int n) {
+		debug
+			writeln("Saving ...");
 		string definition = std.string.format("fractal%05d.ifs3d", n);
 		string picture = std.string.format("fractal%05d.jpeg", n);
 		string

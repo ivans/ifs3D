@@ -43,6 +43,8 @@ int main(string[] args) {
 	global.scene.updateTransformationMatrix();
 
 	if(args.length == 2) {
+		debug
+			writefln("Loading scene from file %s given as argument.", args[1]);
 		global.scene = new Scene(new std.stream.File(args[1], FileMode.In));
 	}
 
@@ -192,12 +194,11 @@ void setCallbackDelegates() {
 	};
 
 	callback.mousePos = (int x, int y) {
-		debug
-			global.o.writefln("Mouse pos: ", x, ", ", y);
 		mouse.XDelta = x - mouse.X;
 		mouse.YDelta = y - mouse.Y;
 		debug
-			global.o.writefln("Mouse delta: ", mouse.XDelta, ", ", mouse.YDelta);
+			global.o.writefln("Mouse pos (%s, %s), delta (%s, %s)", x, y,
+					mouse.XDelta, mouse.YDelta);
 		mouse.X = x;
 		mouse.Y = y;
 	};
@@ -205,7 +206,6 @@ void setCallbackDelegates() {
 	callback.mouseButton = (int button, int action) {
 		debug
 			global.o.writefln("Mouse button: ", button, ", ", action);
-
 		mouse.LeftOld = mouse.Left;
 		mouse.RightOld = mouse.Right;
 		mouse.MiddleOld = mouse.Middle;

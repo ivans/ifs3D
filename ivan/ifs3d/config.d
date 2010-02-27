@@ -45,6 +45,8 @@ class Config {
 	}
 
 	void saveConfigFile(string fileName) {
+		debug
+			writeln("Saving config file to ", fileName);
 		std.stream.File f = new std.stream.File(fileName, FileMode.OutNew);
 		printParams(f);
 		f.close();
@@ -52,6 +54,8 @@ class Config {
 	}
 
 	void loadConfigFile(string fileName) {
+		debug
+			writeln("Loading config file from ", fileName);
 		char[] key;
 		char[] value;
 		std.stream.File f = new std.stream.File(fileName, FileMode.In);
@@ -110,31 +114,32 @@ class Config {
 				writefln(
 						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 
-			mixin(gl3.getMethodPointer("glCreateShader"));
-			mixin(gl3.getMethodPointer("glShaderSource"));
-			mixin(gl3.getMethodPointer("glCompileShader"));
-
-			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
-
-			GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
-
-			string
-					shaderSrc = "
-		void main(void)
-		{
-			vec4 v = vec4(gl_Vertex);		
-			v.z = 0.0;
-			
-			gl_Position = gl_ModelViewProjectionMatrix * v;
-		}";
-
-			writefln("Shader = %s, with source = %s", shader, shaderSrc);
-
-			char* src = cast(char*) &shaderSrc[0];
-
-			gl3.glShaderSource(shader, 1, &src, null);
-			gl3.glCompileShader(shader);
-			writeln("After shader source i compile");
+			//			mixin(gl3.getMethodPointer("glCreateShader"));
+			//			mixin(gl3.getMethodPointer("glShaderSource"));
+			//			mixin(gl3.getMethodPointer("glCompileShader"));
+			//			mixin(gl3.getMethodPointer("glCreateProgram"));
+			//
+			//			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
+			//
+			//			GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+			//
+			//			string
+			//					shaderSrc = "
+			//		void main(void)
+			//		{
+			//			vec4 v = vec4(gl_Vertex);		
+			//			v.z = 0.0;
+			//			
+			//			gl_Position = gl_ModelViewProjectionMatrix * v;
+			//		}";
+			//
+			//			writefln("Shader = %s, with source = %s", shader, shaderSrc);
+			//
+			//			char* src = cast(char*) &shaderSrc[0];
+			//
+			//			gl3.glShaderSource(shader, 1, &src, null);
+			//			gl3.glCompileShader(shader);
+			//			writeln("After shader source i compile");
 		} else {
 			debug
 				writefln(

@@ -265,3 +265,5 @@ extern(System):
 			glShaderSource;
 
 	GLvoid function(GLuint shader) glCompileShader;
+
+	GLuint function() glCreateProgram;
