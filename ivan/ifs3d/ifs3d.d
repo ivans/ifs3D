@@ -25,8 +25,6 @@ pragma(lib, "glu32.lib");
 pragma(lib, "freeimage.lib");
 
 static this() {
-	debug
-		writefln("ifs3d.static this()");
 	setCallbackDelegates();
 }
 
@@ -90,11 +88,14 @@ int main(string[] args) {
 			glExtensions)]);
 
 	try {
+		writefln("Starting main loop...");
 		global.loop.start();
+		writefln("Main loop finished...");
 	} catch(Exception e) {
-		global.o.writefln(e.msg);
+		writefln("Exception was: %s", e.msg);
 	}
 
+	writefln("Terminating console thread...");
 	global.consoleThread.terminate(true);
 	//Ovo više ne radi na D2
 	//global.o.writefln("Waiting for thread to terminate...");
@@ -192,12 +193,12 @@ void setCallbackDelegates() {
 	};
 
 	callback.mousePos = (int x, int y) {
-		debug
-			global.o.writefln("Mouse pos: ", x, ", ", y);
+		static counter = 0;
 		mouse.XDelta = x - mouse.X;
 		mouse.YDelta = y - mouse.Y;
 		debug
-			global.o.writefln("Mouse delta: ", mouse.XDelta, ", ", mouse.YDelta);
+			global.o.writefln("Mouse: pos(%s, %s), delta(%s, %s), %s", x, y,
+					mouse.XDelta, mouse.YDelta, counter++);
 		mouse.X = x;
 		mouse.Y = y;
 	};

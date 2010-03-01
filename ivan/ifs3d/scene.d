@@ -33,18 +33,19 @@ class Scene {
 		for(int i = 0; i < count; i++) {
 			this.addTr(new Transformation(s));
 		}
-		debug {
-			writeln(cameraPosition.toString, cameraLookAt.toString);
-			writeln(count, " transformations");
-			foreach(Transformation t; transformations) {
-				t.toStreamNice(dout);
-			}
-		}
+		//		debug {
+		//			writeln(cameraPosition.toString, cameraLookAt.toString);
+		//			writeln(count, " transformations");
+		//			foreach(Transformation t; transformations) {
+		//				t.toStreamNice(dout);
+		//			}
+		//		}
 		this.updateTransformationMatrix();
 		this.recalculateVolume();
 	}
 
 	void toStream(Stream s) {
+		writefln("scene.toStream begin");
 		s.writefln(transformations.length);
 		s.writefln("%s %s %s", cameraPosition.x, cameraPosition.y,
 				cameraPosition.z);
@@ -52,6 +53,7 @@ class Scene {
 		foreach(t; transformations) {
 			t.toStream(s);
 		}
+		writefln("scene.toStream end");
 	}
 
 	void drawOciste() {
@@ -64,6 +66,9 @@ class Scene {
 	}
 
 	void draw() {
+
+		static counter = 0;
+		//		writefln(". %s", counter++);
 
 		bool drawToFeedbackBuffer = true;
 
@@ -182,24 +187,24 @@ class Scene {
 	}
 
 	public void increaseStack() {
-		debug
-			writef("inc stack: ");
+		//		debug
+		//			writef("inc stack: ");
 		synchronized(this)
 			moveStack.length = moveStack.length + 1;
-		debug
-			writeln(moveStack.length);
+		//		debug
+		//			writeln(moveStack.length);
 	}
 
 	public void decreaseStack() {
-		debug
-			writef("dec stack: ");
+		//		debug
+		//			writef("dec stack: ");
 		int size = moveStack.length - 1;
 		if(size > 0) {
 			synchronized(this)
 				moveStack.length = size;
 		}
-		debug
-			writeln(moveStack.length);
+		//		debug
+		//			writeln(moveStack.length);
 	}
 
 	void addTr(Transformation t) {
@@ -230,9 +235,9 @@ class Scene {
 	}
 
 	public void ZoomCamera(int mouseYDelta) {
-		debug
-			writefln(cameraPosition.toString, " ", cameraLookAt.toString, " ",
-					mouseYDelta);
+		//		debug
+		//			writefln(cameraPosition.toString, " ", cameraLookAt.toString, " ",
+		//					mouseYDelta);
 		real vx = cameraPosition.x - cameraLookAt.x;
 		real vy = cameraPosition.y - cameraLookAt.y;
 		real vz = cameraPosition.z - cameraLookAt.z;
@@ -513,7 +518,7 @@ class Scene {
 		[155, 000, 055]
 	, ];
 
-	const int POINTS_PER_ITERATION = 10000;
+	const int POINTS_PER_ITERATION = 100;
 
 	FIBITMAP* buffer;
 	float[][] zBuffer;

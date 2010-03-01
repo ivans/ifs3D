@@ -27,14 +27,14 @@ package float[] bgColor;
 alias std.cstream.dout o;
 
 static this() {
-	debug
-		o.writefln("global.static this()");
+	//	debug
+	//		o.writefln("global.static this()");
 	bgColor = bgColorBlack;
 }
 
 void init() {
-	debug
-		o.writefln("Init Config...");
+	//	debug
+	//		o.writefln("Init Config...");
 	conf = new Config("ifs3d_init.txt");
 	loop = new GameLoop;
 	mouse = new MouseState;

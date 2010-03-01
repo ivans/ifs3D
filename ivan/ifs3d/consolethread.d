@@ -32,8 +32,8 @@ public class ConsoleThread: Thread {
 	//TODO D2 problem sa shared
 	//synchronized 
 	void terminate(bool term) {
-		this.term = term;
-		global.o.writefln("Terminating console thread...");
+		synchronized(this)
+			this.term = term;
 	}
 
 	bool term = false;

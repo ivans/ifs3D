@@ -36,11 +36,13 @@ class GameLoop {
 
 	void start() {
 		while(running) {
+			static counter = 0;
 			calculateFps();
 			glfwGetMousePos(&global.mouse.X, &global.mouse.Y);
 			draw();
 			running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(
 					GLFW_OPENED);
+			//			std.stdio.writefln("Running = %s, %s", running, counter++);
 		}
 	}
 }

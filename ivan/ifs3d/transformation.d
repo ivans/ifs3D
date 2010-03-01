@@ -264,8 +264,8 @@ class Transformation {
 
 	//transform from 'from' to 'this'
 	private real[][] CalculateTransformationMatrix(Transformation from) {
-		debug
-			writefln("Calculating transformation matrix:");
+		//		debug
+		//			writefln("Calculating transformation matrix:");
 		Transformation to = this;
 		real[][] M1 = array!(real[])(array!(real)(1, 0, 0, -from.X), array!(
 				real)(0, 1, 0, -from.Y), array!(real)(0, 0, 1, -from.Z),
@@ -293,8 +293,8 @@ class Transformation {
 		Mul4Matrix(matrix, M2, temp);
 		Mul4Matrix(temp, M1, matrix);
 
-		debug
-			writeln(matrix);
+		//		debug
+		//			writeln(matrix);
 
 		return matrix;
 	}

@@ -117,8 +117,8 @@ GLint writeJpeg(string fileName) {
 
 	lImageSize = iViewport[2] * 3 * iViewport[3];
 
-	debug
-		writefln("Image size: %s x %s", iViewport[2], iViewport[3]);
+	//	debug
+	//		writefln("Image size: %s x %s", iViewport[2], iViewport[3]);
 	FIBITMAP* thePicture = FreeImage_Allocate(iViewport[2], iViewport[3], 24);
 
 	pBits.length = lImageSize;
