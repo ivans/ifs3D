@@ -178,7 +178,7 @@ void setCallbackDelegates() {
 
 	callback.windowResize = (int w, int h) {
 		debug
-			global.o.writefln("Resizing to: (", w, ",", h, ")");
+			writefln("Resizing to: (", w, ",", h, ")");
 		global.conf.setIntParam("resX", w);
 		global.conf.setIntParam("resY", h);
 		glViewport(0, 0, w, h);
@@ -187,7 +187,7 @@ void setCallbackDelegates() {
 
 	callback.mouseWheel = (int pos) {
 		debug
-			global.o.writefln("Mouse scroll: ", pos);
+			writefln("Mouse scroll: ", pos);
 		mouse.WheelDelta = pos - mouse.WheelPos;
 		mouse.WheelPos = pos;
 	};
@@ -197,7 +197,7 @@ void setCallbackDelegates() {
 		mouse.XDelta = x - mouse.X;
 		mouse.YDelta = y - mouse.Y;
 		debug
-			global.o.writefln("Mouse: pos(%s, %s), delta(%s, %s), %s", x, y,
+			writefln("Mouse: pos(%s, %s), delta(%s, %s), %s", x, y,
 					mouse.XDelta, mouse.YDelta, counter++);
 		mouse.X = x;
 		mouse.Y = y;
@@ -205,7 +205,7 @@ void setCallbackDelegates() {
 
 	callback.mouseButton = (int button, int action) {
 		debug
-			global.o.writefln("Mouse button: ", button, ", ", action);
+			writefln("Mouse button: ", button, ", ", action);
 
 		mouse.LeftOld = mouse.Left;
 		mouse.RightOld = mouse.Right;
@@ -230,13 +230,13 @@ void setCallbackDelegates() {
 
 	callback.keyCallback = (int key, int action) {
 		debug
-			global.o.writefln("Key: ", key, ", ", action);
+			writefln("Key: ", key, ", ", action);
 		keys.update(key, action);
 	};
 
 	callback.characterCallback = (int character, int state) {
 		debug
-			global.o.writefln("Character: ", character, ", ", state);
+			writefln("Character: ", character, ", ", state);
 		char c = cast(char) character;
 		if(state == GLFW_PRESS) {
 			switch(c) {
