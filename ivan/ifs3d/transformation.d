@@ -11,6 +11,9 @@ T[] array(T)(T[] a...) {
 	return a.dup;
 }
 
+//comment this line to make code work...
+version = does_not_work;
+
 class Transformation {
 	void initMatrix() {
 		matrix_from2biUnit.length = 4;
@@ -68,14 +71,19 @@ class Transformation {
 
 	public void draw(real r, real g, real b) {
 		real[] transform(real xx, real yy, real zz) {
-			real[][] rot = MakeRotationMatrix(this.Ra, this.Rx, this.Ry,
-					this.Rz);
+
+			version(does_not_work) {
+				real[][] rot = MakeRotationMatrix(this.Ra, this.Rx, this.Ry,
+						this.Rz);
+			}
 
 			xx -= X_;
 			yy -= Y_;
 			zz -= Z_;
 
-			transformPoint(xx, yy, zz, rot);
+			version(does_not_work) {
+				transformPoint(xx, yy, zz, rot);
+			}
 
 			return array!(real)(xx + X_, yy + Y_, zz + Z_);
 		}
