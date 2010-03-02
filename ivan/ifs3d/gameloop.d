@@ -36,21 +36,11 @@ class GameLoop {
 
 	void start() {
 		while(running) {
-			debug
-				writeln("Loop time = ", time);
 			calculateFps();
-			debug
-				writeln("Getting mouse pos");
 			glfwGetMousePos(&global.mouse.X, &global.mouse.Y);
-			debug
-				writeln("Drawing...");
 			draw();
-			debug
-				writeln("Calc if still running");
 			running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(
 					GLFW_OPENED);
-			debug
-				writeln("Running = ", running);
 		}
 	}
 }

@@ -25,8 +25,6 @@ pragma(lib, "glu32.lib");
 pragma(lib, "freeimage.lib");
 
 static this() {
-	debug
-		writefln("ifs3d.static this()");
 	setCallbackDelegates();
 }
 
@@ -92,11 +90,14 @@ int main(string[] args) {
 			glExtensions)]);
 
 	try {
+		writefln("Starting main loop...");
 		global.loop.start();
+		writefln("Main loop finished...");
 	} catch(Exception e) {
-		global.o.writefln(e.msg);
+		writefln("Exception was: %s", e.msg);
 	}
 
+	writefln("Terminating console thread...");
 	global.consoleThread.terminate(true);
 	//Ovo više ne radi na D2
 	//global.o.writefln("Waiting for thread to terminate...");
@@ -179,7 +180,7 @@ void setCallbackDelegates() {
 
 	callback.windowResize = (int w, int h) {
 		debug
-			global.o.writefln("Resizing to: (", w, ",", h, ")");
+			writefln("Resizing to: (", w, ",", h, ")");
 		global.conf.setIntParam("resX", w);
 		global.conf.setIntParam("resY", h);
 		glViewport(0, 0, w, h);
@@ -188,24 +189,26 @@ void setCallbackDelegates() {
 
 	callback.mouseWheel = (int pos) {
 		debug
-			global.o.writefln("Mouse scroll: ", pos);
+			writefln("Mouse scroll: ", pos);
 		mouse.WheelDelta = pos - mouse.WheelPos;
 		mouse.WheelPos = pos;
 	};
 
 	callback.mousePos = (int x, int y) {
+		static counter = 0;
 		mouse.XDelta = x - mouse.X;
 		mouse.YDelta = y - mouse.Y;
 		debug
-			global.o.writefln("Mouse pos (%s, %s), delta (%s, %s)", x, y,
-					mouse.XDelta, mouse.YDelta);
+			writefln("Mouse: pos(%s, %s), delta(%s, %s), %s", x, y,
+					mouse.XDelta, mouse.YDelta, counter++);
 		mouse.X = x;
 		mouse.Y = y;
 	};
 
 	callback.mouseButton = (int button, int action) {
 		debug
-			global.o.writefln("Mouse button: ", button, ", ", action);
+			writefln("Mouse button: ", button, ", ", action);
+
 		mouse.LeftOld = mouse.Left;
 		mouse.RightOld = mouse.Right;
 		mouse.MiddleOld = mouse.Middle;
@@ -229,13 +232,13 @@ void setCallbackDelegates() {
 
 	callback.keyCallback = (int key, int action) {
 		debug
-			global.o.writefln("Key: ", key, ", ", action);
+			writefln("Key: ", key, ", ", action);
 		keys.update(key, action);
 	};
 
 	callback.characterCallback = (int character, int state) {
 		debug
-			global.o.writefln("Character: ", character, ", ", state);
+			writefln("Character: ", character, ", ", state);
 		char c = cast(char) character;
 		if(state == GLFW_PRESS) {
 			switch(c) {

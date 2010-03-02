@@ -30,12 +30,12 @@ class Config {
 		intParams["picSmallY"] = 768;
 
 		if(std.file.exists(fileName)) {
-			debug
-				global.o.writefln("Config file found, loading...");
+			//			debug
+			//				global.o.writefln("Config file found, loading...");
 			loadConfigFile(fileName);
 		} else {
-			debug
-				global.o.writefln("Config file not found, creating...");
+			//			debug
+			//				global.o.writefln("Config file not found, creating...");
 			saveConfigFile(fileName);
 		}
 
@@ -91,8 +91,8 @@ class Config {
 	}
 
 	void initGlfw() {
-		debug
-			global.o.writefln("Init GLFW and get current desktop mode...");
+		//		debug
+		//			global.o.writefln("Init GLFW and get current desktop mode...");
 		InitFreeImage();
 		glfwInit();
 		int v1, v2, v3;
@@ -110,9 +110,9 @@ class Config {
 	void initGlExtensionMethods() {
 		if(testExtension("GL_ARB_vertex_shader") == 1 && testExtension(
 				"GL_ARB_fragment_shader") == 1) {
-			debug
-				writefln(
-						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+			//			debug
+			//				writefln(
+			//						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 
 			//			mixin(gl3.getMethodPointer("glCreateShader"));
 			//			mixin(gl3.getMethodPointer("glShaderSource"));
@@ -141,16 +141,16 @@ class Config {
 			//			gl3.glCompileShader(shader);
 			//			writeln("After shader source i compile");
 		} else {
-			debug
-				writefln(
-						"Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+			//			debug
+			//				writefln(
+			//						"Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 		}
 
 	}
 
 	void registerCallbacks() {
-		debug
-			global.o.writefln("register callbacks...");
+		//		debug
+		//			global.o.writefln("register callbacks...");
 		glfwSetWindowSizeCallback(cast(GLFWwindowsizefun) &windowResizeFunc);
 
 		glfwSetKeyCallback(cast(GLFWkeyfun) &keyCallbackFunc);
@@ -213,8 +213,8 @@ class Config {
 	}
 
 	void terminateGlfw() {
-		debug
-			global.o.writefln("Terminate GLFW...");
+		//		debug
+		//			global.o.writefln("Terminate GLFW...");
 		glfwTerminate();
 	}
 
