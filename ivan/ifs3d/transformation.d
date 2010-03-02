@@ -22,11 +22,6 @@ T[][] newQuadraticMatrix(T)(ref T[][] m, int size) {
 
 class Transformation {
 
-	void initMatrix() {
-		//		newQuadraticMatrix(matrix_from2biUnit, 4);
-		//		newQuadraticMatrix(matrix_from2biUnit, 4);
-	}
-
 	this(ifsfloat x, ifsfloat y, ifsfloat z) {
 		this(x, y, z, 1, 1, 1);
 	}
@@ -44,7 +39,6 @@ class Transformation {
 	this(ifsfloat x, ifsfloat y, ifsfloat z, ifsfloat wx, ifsfloat wy,
 			ifsfloat wz, ifsfloat ra, ifsfloat rx, ifsfloat ry, ifsfloat rz,
 			int func) {
-		initMatrix();
 		X = x;
 		Y = y;
 		Z = z;
@@ -59,7 +53,6 @@ class Transformation {
 	}
 
 	this(Stream s) {
-		initMatrix();
 		s.readf(&X_, &Y_, &Z_, &Wx_, &Wy_, &Wz_, &Ra_, &Rx_, &Ry_, &Rz_, &func);
 	}
 
@@ -75,10 +68,10 @@ class Transformation {
 
 	public void draw(ifsfloat r, ifsfloat g, ifsfloat b) {
 
-		ifsfloat[4][4] rot;
-		//newQuadraticMatrix(rot, 4);
+		ifsfloat[4][4] rot = void;
 
-		ifsfloat[] transform(ifsfloat xx, ifsfloat yy, ifsfloat zz) {
+		void transform(ifsfloat xx, ifsfloat yy, ifsfloat zz,
+				ref ifsfloat[3] point) {
 
 			MakeRotationMatrix(this.Ra, this.Rx, this.Ry, this.Rz, rot);
 
@@ -88,15 +81,20 @@ class Transformation {
 
 			transformPoint(xx, yy, zz, rot);
 
-			return array!(ifsfloat)(xx + X_, yy + Y_, zz + Z_);
+			point[0] = xx + X_;
+			point[1] = yy + Y_;
+			point[2] = zz + Z_;
 		}
 
-		ifsfloat[][]
-				tocke = array!(ifsfloat[])(transform(X, Y, Z), transform(
-						X + Wx, Y, Z), transform(X + Wx, Y, Z + Wz), transform(
-						X, Y, Z + Wz), transform(X, Y + Wy, Z), transform(
-						X + Wx, Y + Wy, Z), transform(X + Wx, Y + Wy, Z + Wz),
-						transform(X, Y + Wy, Z + Wz));
+		ifsfloat[3][8] tocke = void;
+		transform(X, Y, Z, tocke[0]);
+		transform(X + Wx, Y, Z, tocke[1]);
+		transform(X + Wx, Y, Z + Wz, tocke[2]);
+		transform(X, Y, Z + Wz, tocke[3]);
+		transform(X, Y + Wy, Z, tocke[4]);
+		transform(X + Wx, Y + Wy, Z, tocke[5]);
+		transform(X + Wx, Y + Wy, Z + Wz, tocke[6]);
+		transform(X, Y + Wy, Z + Wz, tocke[7]);
 
 		glColor3f(r, g, b);
 		glBegin(GL_LINE_LOOP);
@@ -123,11 +121,11 @@ class Transformation {
 		glEnd();
 	}
 
-	ifsfloat[] transformPointToArray(ifsfloat x, ifsfloat y, ifsfloat z) {
-		transformPoint(x, y, z);
-		ifsfloat[] a = array!(ifsfloat)(x, y, z);
-		return a;
-	}
+	//	ifsfloat[] transformPointToArray(ifsfloat x, ifsfloat y, ifsfloat z) {
+	//		transformPoint(x, y, z);
+	//		ifsfloat[] a = array!(ifsfloat)(x, y, z);
+	//		return a;
+	//	}
 
 	public void transformPoint(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z) {
 		transformPoint(x, y, z, matrix_from2biUnit);
