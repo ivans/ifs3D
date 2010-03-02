@@ -10,6 +10,7 @@ private {
 	import std.stream, std.cstream;
 	import ivan.ifs3d.writetga;
 	import ivan.ifs3d.config;
+	import ivan.ifs3d.types;
 }
 
 class Scene {
@@ -88,9 +89,9 @@ class Scene {
 
 		short nlRand() {
 			//TODO proučiti da li je ovaj rand ok!
-			real
+			ifsfloat
 					randNum = (std.random.uniform(0, 10000) % (transformationVolumeSum));
-			real counter = 0;
+			ifsfloat counter = 0;
 			for(long index = 1; index < transformations.length; index++) {
 				counter += abs(transformations[cast(int) index].area);
 				if(randNum < counter)
@@ -220,11 +221,11 @@ class Scene {
 	}
 
 	public void setRotVectorOfSelected() {
-		real vx = cameraPosition.x - cameraLookAt.x;
-		real vy = cameraPosition.y - cameraLookAt.y;
-		real vz = cameraPosition.z - cameraLookAt.z;
+		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
+		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
+		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
 
-		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		ifsfloat len = sqrt(vx * vx + vy * vy + vz * vz);
 		vx /= len;
 		vy /= len;
 		vz /= len;
@@ -245,11 +246,11 @@ class Scene {
 		//		debug
 		//			writefln(cameraPosition.toString, " ", cameraLookAt.toString, " ",
 		//					mouseYDelta);
-		real vx = cameraPosition.x - cameraLookAt.x;
-		real vy = cameraPosition.y - cameraLookAt.y;
-		real vz = cameraPosition.z - cameraLookAt.z;
+		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
+		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
+		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
 
-		real div = mouseYDelta > 0 ? 1.1f : 1 / 1.1f;
+		ifsfloat div = mouseYDelta > 0 ? 1.1f : 1 / 1.1f;
 		if(mouseYDelta == 0)
 			div = 1;
 
@@ -263,11 +264,11 @@ class Scene {
 	}
 
 	public void moveCameraLookAt(int mouseXDelta, int mouseYDelta) {
-		real vx = cameraPosition.x - cameraLookAt.x;
-		real vy = cameraPosition.y - cameraLookAt.y;
-		real vz = cameraPosition.z - cameraLookAt.z;
+		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
+		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
+		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
 
-		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		ifsfloat len = sqrt(vx * vx + vy * vy + vz * vz);
 		vx /= len;
 		vy /= len;
 		vz /= len;
@@ -278,30 +279,30 @@ class Scene {
 	}
 
 	public void RotateOciste(int mouseXDelta, int mouseYDelta) {
-		real vx = cameraPosition.x - cameraLookAt.x;
-		real vy = cameraPosition.y - cameraLookAt.y;
-		real vz = cameraPosition.z - cameraLookAt.z;
+		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
+		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
+		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
 
-		real len = sqrt(vx * vx + vy * vy + vz * vz);
+		ifsfloat len = sqrt(vx * vx + vy * vy + vz * vz);
 		vx /= len;
 		vy /= len;
 		vz /= len;
 
-		real[][] M = Transformation.MakeRotationMatrix(mouseXDelta / 200f, 0,
-				1, 0);
+		ifsfloat[4][4] M;
+		Transformation.MakeRotationMatrix(mouseXDelta / 200f, 0, 1, 0, M);
 		ivan.ifs3d.transformation.Transformation.transformPoint(
 				this.cameraPosition.x, this.cameraPosition.y,
 				this.cameraPosition.z, M);
-		M = Transformation.MakeRotationMatrix(mouseYDelta / 200f, vz, 0, -vx);
+		Transformation.MakeRotationMatrix(mouseYDelta / 200f, vz, 0, -vx, M);
 		ivan.ifs3d.transformation.Transformation.transformPoint(
 				cameraPosition.x, cameraPosition.y, cameraPosition.z, M);
 	}
 
-	public void scaleSelectedTrans(real dx, real dy) {
-		real vx = cameraPosition.x - cameraLookAt.x;
-		real vy = cameraPosition.y - cameraLookAt.y;
-		real vz = cameraPosition.z - cameraLookAt.z;
-		real len = sqrt(vx * vx + vy * vy + vz * vz);
+	public void scaleSelectedTrans(ifsfloat dx, ifsfloat dy) {
+		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
+		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
+		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
+		ifsfloat len = sqrt(vx * vx + vy * vy + vz * vz);
 		vx /= len;
 		vy /= len;
 		vz /= len;
@@ -319,11 +320,11 @@ class Scene {
 		this.recalculateVolume();
 	}
 
-	public void moveSelectedTrans(real dx, real dy) {
-		real vx = cameraPosition.x - cameraLookAt.x;
-		real vy = cameraPosition.y - cameraLookAt.y;
-		real vz = cameraPosition.z - cameraLookAt.z;
-		real len = sqrt(vx * vx + vy * vy + vz * vz);
+	public void moveSelectedTrans(ifsfloat dx, ifsfloat dy) {
+		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
+		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
+		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
+		ifsfloat len = sqrt(vx * vx + vy * vy + vz * vz);
 		vx /= len;
 		vy /= len;
 		vz /= len;
@@ -352,7 +353,7 @@ class Scene {
 		}
 	}
 
-	void drawTrans(real r, real g, real b) {
+	void drawTrans(ifsfloat r, ifsfloat g, ifsfloat b) {
 		foreach(int i, t; transformations) {
 			if(i != selectedTrans)
 				t.draw(1 - r, 1 - g, 1 - b);
@@ -497,7 +498,7 @@ class Scene {
 
 	package int selectedTrans = 0;
 	package Transformation[] transformations;
-	private real transformationVolumeSum = 0;
+	private ifsfloat transformationVolumeSum = 0;
 
 	void recalculateVolume() {
 		transformationVolumeSum = 0;
@@ -511,7 +512,7 @@ class Scene {
 	package Point cameraPosition;
 	package Point cameraLookAt;
 
-	package real x = 0, y = 0, z = 0;
+	package ifsfloat x = 0, y = 0, z = 0;
 	package bool printPoint = false;
 
 	private ubyte[][] colors = [
@@ -527,7 +528,7 @@ class Scene {
 		[155, 000, 055]
 	, ];
 
-	const int POINTS_PER_ITERATION = 100;
+	const int POINTS_PER_ITERATION = 10000;
 
 	FIBITMAP* buffer;
 	float[][] zBuffer;

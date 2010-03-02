@@ -5,6 +5,8 @@ private {
 	import std.stream;
 	import std.stdio;
 	import glfw;
+
+	import ivan.ifs3d.types;
 }
 
 T[] array(T)(T[] a...) {
@@ -14,32 +16,37 @@ T[] array(T)(T[] a...) {
 //comment this line to make code work...
 version = does_not_work;
 
-class Transformation {
-	void initMatrix() {
-		matrix_from2biUnit.length = 4;
-		foreach(ref x; matrix_from2biUnit)
-			x.length = 4;
+T[][] newQuadraticMatrix(T)(ref T[][] m, int size) {
+	m.length = size;
+	foreach(ref row; m)
+		row.length = size;
+	return m;
+}
 
-		matrix_biUnit2This.length = 4;
-		foreach(ref x; matrix_biUnit2This)
-			x.length = 4;
+class Transformation {
+
+	void initMatrix() {
+		//		newQuadraticMatrix(matrix_from2biUnit, 4);
+		//		newQuadraticMatrix(matrix_from2biUnit, 4);
 	}
 
-	this(real x, real y, real z) {
+	this(ifsfloat x, ifsfloat y, ifsfloat z) {
 		this(x, y, z, 1, 1, 1);
 	}
 
-	this(real x, real y, real z, real wx, real wy, real wz) {
+	this(ifsfloat x, ifsfloat y, ifsfloat z, ifsfloat wx, ifsfloat wy,
+			ifsfloat wz) {
 		this(x, y, z, wx, wy, wz, 0, 1, 0, 0);
 	}
 
-	this(real x, real y, real z, real wx, real wy, real wz, real ra, real rx,
-			real ry, real rz) {
+	this(ifsfloat x, ifsfloat y, ifsfloat z, ifsfloat wx, ifsfloat wy,
+			ifsfloat wz, ifsfloat ra, ifsfloat rx, ifsfloat ry, ifsfloat rz) {
 		this(x, y, z, wx, wy, wz, ra, rx, ry, rz, 0);
 	}
 
-	this(real x, real y, real z, real wx, real wy, real wz, real ra, real rx,
-			real ry, real rz, int func) {
+	this(ifsfloat x, ifsfloat y, ifsfloat z, ifsfloat wx, ifsfloat wy,
+			ifsfloat wz, ifsfloat ra, ifsfloat rx, ifsfloat ry, ifsfloat rz,
+			int func) {
 		initMatrix();
 		X = x;
 		Y = y;
@@ -69,12 +76,15 @@ class Transformation {
 				Wx_, Wy_, Wz_, Ra_, Rx_, Ry_, Rz_, func);
 	}
 
-	public void draw(real r, real g, real b) {
-		real[] transform(real xx, real yy, real zz) {
+	public void draw(ifsfloat r, ifsfloat g, ifsfloat b) {
+
+		ifsfloat[4][4] rot;
+		//newQuadraticMatrix(rot, 4);
+
+		ifsfloat[] transform(ifsfloat xx, ifsfloat yy, ifsfloat zz) {
 
 			version(does_not_work) {
-				real[][] rot = MakeRotationMatrix(this.Ra, this.Rx, this.Ry,
-						this.Rz);
+				MakeRotationMatrix(this.Ra, this.Rx, this.Ry, this.Rz, rot);
 			}
 
 			xx -= X_;
@@ -85,14 +95,14 @@ class Transformation {
 				transformPoint(xx, yy, zz, rot);
 			}
 
-			return array!(real)(xx + X_, yy + Y_, zz + Z_);
+			return array!(ifsfloat)(xx + X_, yy + Y_, zz + Z_);
 		}
 
-		real[][]
-				tocke = array!(real[])(transform(X, Y, Z), transform(X + Wx, Y,
-						Z), transform(X + Wx, Y, Z + Wz), transform(X, Y,
-						Z + Wz), transform(X, Y + Wy, Z), transform(X + Wx,
-						Y + Wy, Z), transform(X + Wx, Y + Wy, Z + Wz),
+		ifsfloat[][]
+				tocke = array!(ifsfloat[])(transform(X, Y, Z), transform(
+						X + Wx, Y, Z), transform(X + Wx, Y, Z + Wz), transform(
+						X, Y, Z + Wz), transform(X, Y + Wy, Z), transform(
+						X + Wx, Y + Wy, Z), transform(X + Wx, Y + Wy, Z + Wz),
 						transform(X, Y + Wy, Z + Wz));
 
 		glColor3f(r, g, b);
@@ -120,26 +130,27 @@ class Transformation {
 		glEnd();
 	}
 
-	real[] transformPointToArray(real x, real y, real z) {
+	ifsfloat[] transformPointToArray(ifsfloat x, ifsfloat y, ifsfloat z) {
 		transformPoint(x, y, z);
-		real[] a = array!(real)(x, y, z);
+		ifsfloat[] a = array!(ifsfloat)(x, y, z);
 		return a;
 	}
 
-	public void transformPoint(ref real x, ref real y, ref real z) {
+	public void transformPoint(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z) {
 		transformPoint(x, y, z, matrix_from2biUnit);
 		Transformation.applyFunction(x, y, z, this.func);
 		transformPoint(x, y, z, matrix_biUnit2This);
 	}
 
-	static void applyFunction(ref real x, ref real y, ref real z, int f1) {
+	static void applyFunction(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z,
+			int f1) {
 		if(f1 == 0)
 			return;
-		real r = sqrt(x * x + y * y);
-		real thetayx = atan(y / x);
-		real theta = atan(y / x);
-		real thetazy = atan(z / y);
-		real thetaxz = atan(x / z);
+		ifsfloat r = sqrt(x * x + y * y);
+		ifsfloat thetayx = atan(y / x);
+		ifsfloat theta = atan(y / x);
+		ifsfloat thetazy = atan(z / y);
+		ifsfloat thetaxz = atan(x / z);
 		switch(f1) {
 			case 0:
 			//linear
@@ -227,21 +238,21 @@ class Transformation {
 			break;
 			case 16:
 				//1/(x+yi)
-				real xtemp = x, ytemp = y;
-				real naz = xtemp * xtemp + ytemp * ytemp;
+				ifsfloat xtemp = x, ytemp = y;
+				ifsfloat naz = xtemp * xtemp + ytemp * ytemp;
 				x = xtemp / naz;
 				y = -ytemp / naz;
 			break;
 			case 17:
 				//x,y,z, swap
-				real temp = x;
+				ifsfloat temp = x;
 				x = y;
 				y = z;
 				z = temp;
 			break;
 			case 18:
 				//1/(x+yi)
-				real naz = x * x + y * y + z * z;
+				ifsfloat naz = x * x + y * y + z * z;
 				x = x / naz;
 				y = -y / naz;
 				z = z / naz;
@@ -251,8 +262,9 @@ class Transformation {
 		}
 	}
 
-	static void transformPoint(ref real x, ref real y, ref real z, real[][] m) {
-		real x2, y2, z2, h2;
+	static void transformPoint(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z,
+			ref ifsfloat[4][4] m) {
+		ifsfloat x2, y2, z2, h2;
 
 		x2 = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3] * 1;
 		y2 = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3] * 1;
@@ -266,49 +278,53 @@ class Transformation {
 
 	//need: transform this->biUnit, biUnit->from
 	public void CalculateTransformationMatrix2(Transformation from) {
-		matrix_from2biUnit = biUnit.CalculateTransformationMatrix(from);
-		matrix_biUnit2This = this.CalculateTransformationMatrix(biUnit);
+		biUnit.CalculateTransformationMatrix(from, matrix_from2biUnit);
+		this.CalculateTransformationMatrix(biUnit, matrix_biUnit2This);
 	}
 
 	//transform from 'from' to 'this'
-	private real[][] CalculateTransformationMatrix(Transformation from) {
+	private void CalculateTransformationMatrix(Transformation from,
+			ref ifsfloat[4][4] mat) {
 		//		debug
 		//			writefln("Calculating transformation matrix:");
 		Transformation to = this;
-		real[][] M1 = array!(real[])(array!(real)(1, 0, 0, -from.X), array!(
-				real)(0, 1, 0, -from.Y), array!(real)(0, 0, 1, -from.Z),
-				array!(real)(0, 0, 0, 1));
-		real[][] M2 = MakeRotationMatrix(-from.Ra, from.Rx, from.Ry, from.Rz);
-		real[][] M3 = array!(real[])(array!(real)(to.Wx / from.Wx, 0, 0, 0),
-				array!(real)(0, to.Wy / from.Wy, 0, 0), array!(real)(0, 0,
-						to.Wz / from.Wz, 0), array!(real)(0, 0, 0, 1));
-		real[][] M4 = MakeRotationMatrix(to.Ra, to.Rx, to.Ry, to.Rz);
-		real[][] M5 = array!(real[])(array!(real)(1, 0, 0, to.X), array!(real)(
-				0, 1, 0, to.Y), array!(real)(0, 0, 1, to.Z), array!(real)(0, 0,
-				0, 1));
+		ifsfloat[4][4] M1 = [
+			[1, 0, 0, -from.X],
+			[0, 1, 0, -from.Y],
+			[0, 0, 1, -from.Z],
+			[0, 0, 0, 1]
+		];
+		ifsfloat[4][4] M2;
+		MakeRotationMatrix(-from.Ra, from.Rx, from.Ry, from.Rz, M2);
+		ifsfloat[4][4] M3 = [
+			[to.Wx / from.Wx, 0, 0, 0],
+			[0, to.Wy / from.Wy, 0, 0],
+			[0, 0, to.Wz / from.Wz, 0],
+			[0, 0, 0, 1]
+		];
+		ifsfloat[4][4] M4;
+		MakeRotationMatrix(to.Ra, to.Rx, to.Ry, to.Rz, M4);
+		ifsfloat[4][4] M5 = [
+			[1, 0, 0, to.X],
+			[0, 1, 0, to.Y],
+			[0, 0, 1, to.Z],
+			[0, 0, 0, 1]
+		];
 
-		real[][] temp, matrix;
-		temp.length = 4;
-		foreach(ref x; temp)
-			x.length = 4;
-
-		matrix.length = 4;
-		foreach(ref x; matrix)
-			x.length = 4;
+		ifsfloat[4][4] temp;
 
 		Mul4Matrix(M5, M4, temp);
-		Mul4Matrix(temp, M3, matrix);
-		Mul4Matrix(matrix, M2, temp);
-		Mul4Matrix(temp, M1, matrix);
+		Mul4Matrix(temp, M3, mat);
+		Mul4Matrix(mat, M2, temp);
+		Mul4Matrix(temp, M1, mat);
 
 		//		debug
 		//			writeln(matrix);
 
-		return matrix;
 	}
 
-	void Mul4Matrix(real[][] a, real[][] b, real[][] c) {
-		real sum;
+	void Mul4Matrix(ifsfloat[4][4] a, ifsfloat[4][4] b, ref ifsfloat[4][4] c) {
+		ifsfloat sum;
 		for(int row = 0; row < 4; row++) {
 			for(int col = 0; col < 4; col++) {
 				sum = 0;
@@ -322,128 +338,138 @@ class Transformation {
 		}
 	}
 
-	public static real[][] MakeRotationMatrix(real ra, real rx, real ry,
-			real rz) {
-		real w = cast(real) cos(ra / 2);
-		real x = rx * cast(real) sin(ra / 2);
-		real y = ry * cast(real) sin(ra / 2);
-		real z = rz * cast(real) sin(ra / 2);
+	public static void MakeRotationMatrix(ifsfloat ra, ifsfloat rx,
+			ifsfloat ry, ifsfloat rz, ref ifsfloat[4][4] mat) {
+		ifsfloat w = cast(ifsfloat) cos(ra / 2);
+		ifsfloat x = rx * cast(ifsfloat) sin(ra / 2);
+		ifsfloat y = ry * cast(ifsfloat) sin(ra / 2);
+		ifsfloat z = rz * cast(ifsfloat) sin(ra / 2);
 
-		real sq(real x) {
+		ifsfloat sq(ifsfloat x) {
 			return x * x;
 		}
-
-		real[][] M2 = array!(real[])(array!(real)(
-				sq(w) + sq(x) - sq(y) - sq(z), 2 * x * y + 2 * w * z,
-				2 * x * z - 2 * w * y, 0), array!(real)(2 * x * y - 2 * w * z,
-				sq(w) - sq(x) + sq(y) - sq(z), 2 * y * z + 2 * w * x, 0),
-				array!(real)(2 * x * z + 2 * w * y, 2 * y * z - 2 * w * x,
-						sq(w) - sq(x) - sq(y) + sq(z), 0), array!(real)(0, 0,
-						0, sq(w) + sq(x) + sq(y) + sq(z)));
-
-		return M2;
+		//row 0
+		mat[0][0] = sq(w) + sq(x) - sq(y) - sq(z);
+		mat[0][1] = 2 * x * y + 2 * w * z;
+		mat[0][2] = 2 * x * z - 2 * w * y;
+		mat[0][3] = 0;
+		//row 1
+		mat[1][0] = 2 * x * y - 2 * w * z;
+		mat[1][1] = sq(w) - sq(x) + sq(y) - sq(z);
+		mat[1][2] = 2 * y * z + 2 * w * x;
+		mat[1][3] = 0;
+		//row 2
+		mat[2][0] = 2 * x * z + 2 * w * y;
+		mat[2][1] = 2 * y * z - 2 * w * x;
+		mat[2][2] = sq(w) - sq(x) - sq(y) + sq(z);
+		mat[2][3] = 0;
+		//row 3
+		mat[3][0] = 0;
+		mat[3][1] = 0;
+		mat[3][2] = 0;
+		mat[3][3] = sq(w) + sq(x) + sq(y) + sq(z);
 	}
 
-	real area() {
+	ifsfloat area() {
 		return Wx_ * Wy_ * Wz_;
 	}
 
-	real X() {
+	ifsfloat X() {
 		return X_;
 	}
 
-	real X(real a) {
+	ifsfloat X(ifsfloat a) {
 		X_ = a;
 		return X_;
 	}
 
-	real Y() {
+	ifsfloat Y() {
 		return Y_;
 	}
 
-	real Y(real a) {
+	ifsfloat Y(ifsfloat a) {
 		Y_ = a;
 		return Y_;
 	}
 
-	real Z() {
+	ifsfloat Z() {
 		return Z_;
 	}
 
-	real Z(real a) {
+	ifsfloat Z(ifsfloat a) {
 		Z_ = a;
 		return Z_;
 	}
 
-	real Wx() {
+	ifsfloat Wx() {
 		return Wx_;
 	}
 
-	real Wx(real a) {
+	ifsfloat Wx(ifsfloat a) {
 		Wx_ = a;
 		return Wx_;
 	}
 
-	real Wy() {
+	ifsfloat Wy() {
 		return Wy_;
 	}
 
-	real Wy(real a) {
+	ifsfloat Wy(ifsfloat a) {
 		Wy_ = a;
 		return Wy_;
 	}
 
-	real Wz() {
+	ifsfloat Wz() {
 		return Wz_;
 	}
 
-	real Wz(real a) {
+	ifsfloat Wz(ifsfloat a) {
 		Wz_ = a;
 		return Wz_;
 	}
 
-	real Ra() {
+	ifsfloat Ra() {
 		return Ra_;
 	}
 
-	real Ra(real a) {
+	ifsfloat Ra(ifsfloat a) {
 		Ra_ = a;
 		return Ra_;
 	}
 
-	real Rx() {
+	ifsfloat Rx() {
 		return Rx_;
 	}
 
-	real Rx(real a) {
+	ifsfloat Rx(ifsfloat a) {
 		Rx_ = a;
 		return Rx_;
 	}
 
-	real Ry() {
+	ifsfloat Ry() {
 		return Ry_;
 	}
 
-	real Ry(real a) {
+	ifsfloat Ry(ifsfloat a) {
 		Ry_ = a;
 		return Ry_;
 	}
 
-	real Rz() {
+	ifsfloat Rz() {
 		return Rz_;
 	}
 
-	real Rz(real a) {
+	ifsfloat Rz(ifsfloat a) {
 		Rz_ = a;
 		return Rz_;
 	}
 
 	package {
-		real X_, Y_, Z_, Wx_, Wy_, Wz_;
-		real Ra_, Rx_, Ry_, Rz_;
+		ifsfloat X_, Y_, Z_, Wx_, Wy_, Wz_;
+		ifsfloat Ra_, Rx_, Ry_, Rz_;
 		int func;
-		real[][] matrix_from2biUnit;
-		real[][] matrix_biUnit2This;
+		ifsfloat[4][4] matrix_from2biUnit;
+		ifsfloat[4][4] matrix_biUnit2This;
 		static Transformation biUnit;
 		static const int numberOfFunc = 19;
 	}

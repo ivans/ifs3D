@@ -5,3 +5,5 @@ ifs3d_init.txt
 *.jpeg
 *.ifs3d
 *.old
+glu32.dll
+opengl32.dll
