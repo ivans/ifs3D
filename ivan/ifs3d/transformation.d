@@ -13,9 +13,6 @@ T[] array(T)(T[] a...) {
 	return a.dup;
 }
 
-//comment this line to make code work...
-version = does_not_work;
-
 T[][] newQuadraticMatrix(T)(ref T[][] m, int size) {
 	m.length = size;
 	foreach(ref row; m)
@@ -83,17 +80,13 @@ class Transformation {
 
 		ifsfloat[] transform(ifsfloat xx, ifsfloat yy, ifsfloat zz) {
 
-			version(does_not_work) {
-				MakeRotationMatrix(this.Ra, this.Rx, this.Ry, this.Rz, rot);
-			}
+			MakeRotationMatrix(this.Ra, this.Rx, this.Ry, this.Rz, rot);
 
 			xx -= X_;
 			yy -= Y_;
 			zz -= Z_;
 
-			version(does_not_work) {
-				transformPoint(xx, yy, zz, rot);
-			}
+			transformPoint(xx, yy, zz, rot);
 
 			return array!(ifsfloat)(xx + X_, yy + Y_, zz + Z_);
 		}
