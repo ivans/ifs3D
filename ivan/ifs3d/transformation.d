@@ -345,29 +345,27 @@ class Transformation {
 		ifsfloat y = ry * cast(ifsfloat) sin(ra / 2);
 		ifsfloat z = rz * cast(ifsfloat) sin(ra / 2);
 
-		ifsfloat sq(ifsfloat x) {
-			return x * x;
-		}
+		ifsfloat ww = w * w, xx = x * x, yy = y * y, zz = z * z;
 		//row 0
-		mat[0][0] = sq(w) + sq(x) - sq(y) - sq(z);
+		mat[0][0] = ww + xx - yy - zz;
 		mat[0][1] = 2 * x * y + 2 * w * z;
 		mat[0][2] = 2 * x * z - 2 * w * y;
 		mat[0][3] = 0;
 		//row 1
 		mat[1][0] = 2 * x * y - 2 * w * z;
-		mat[1][1] = sq(w) - sq(x) + sq(y) - sq(z);
+		mat[1][1] = ww - xx + yy - zz;
 		mat[1][2] = 2 * y * z + 2 * w * x;
 		mat[1][3] = 0;
 		//row 2
 		mat[2][0] = 2 * x * z + 2 * w * y;
 		mat[2][1] = 2 * y * z - 2 * w * x;
-		mat[2][2] = sq(w) - sq(x) - sq(y) + sq(z);
+		mat[2][2] = ww - xx - yy + zz;
 		mat[2][3] = 0;
 		//row 3
 		mat[3][0] = 0;
 		mat[3][1] = 0;
 		mat[3][2] = 0;
-		mat[3][3] = sq(w) + sq(x) + sq(y) + sq(z);
+		mat[3][3] = ww + xx + yy + zz;
 	}
 
 	ifsfloat area() {

@@ -68,8 +68,8 @@ class Scene {
 
 	void draw() {
 
-		static counter = 0;
-		writefln("Drawing %s", counter++);
+		//		static counter = 0;
+		//		writefln("Drawing %s", counter++);
 
 		bool drawToFeedbackBuffer = true;
 
