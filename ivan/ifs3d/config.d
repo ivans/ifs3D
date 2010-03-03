@@ -70,7 +70,7 @@ class Config {
 	void printParams(Stream s) {
 		foreach(key, value; intParams) {
 			if(key != "") {
-				s.writefln("\t%s=%d", key, value);
+				s.writefln("%s %d", key, value);
 			}
 		}
 	}

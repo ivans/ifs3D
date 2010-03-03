@@ -9,16 +9,7 @@ private {
 	import ivan.ifs3d.types;
 }
 
-T[] array(T)(T[] a...) {
-	return a.dup;
-}
-
-T[][] newQuadraticMatrix(T)(ref T[][] m, int size) {
-	m.length = size;
-	foreach(ref row; m)
-		row.length = size;
-	return m;
-}
+//version = draw_transformation_star_point;
 
 class Transformation {
 
@@ -115,17 +106,14 @@ class Transformation {
 			glVertex3f(tocke[4 + i][0], tocke[4 + i][1], tocke[4 + i][2]);
 		}
 		glEnd();
-		glBegin(GL_POINTS);
-		glColor3f(1, 0, 0);
-		glVertex3f(tocke[0][0], tocke[0][1], tocke[0][2]);
-		glEnd();
+		version(draw_transformation_star_point) {
+			glPointSize(5);
+			glBegin(GL_POINTS);
+			glColor3f(1, 0, 0);
+			glVertex3f(tocke[0][0], tocke[0][1], tocke[0][2]);
+			glEnd();
+		}
 	}
-
-	//	ifsfloat[] transformPointToArray(ifsfloat x, ifsfloat y, ifsfloat z) {
-	//		transformPoint(x, y, z);
-	//		ifsfloat[] a = array!(ifsfloat)(x, y, z);
-	//		return a;
-	//	}
 
 	public void transformPoint(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z) {
 		transformPoint(x, y, z, matrix_from2biUnit);

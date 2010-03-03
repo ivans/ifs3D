@@ -34,13 +34,15 @@ class Scene {
 		for(int i = 0; i < count; i++) {
 			this.addTr(new Transformation(s));
 		}
-		//		debug {
-		//			writeln(cameraPosition.toString, cameraLookAt.toString);
-		//			writeln(count, " transformations");
-		//			foreach(Transformation t; transformations) {
-		//				t.toStreamNice(dout);
-		//			}
-		//		}
+		debug {
+			writeln("Constructing scene from stream: cameraPos = ",
+					cameraPosition.toString, "cameraLookaAt = ",
+					cameraLookAt.toString);
+			writeln(count, " transformations");
+			foreach(Transformation t; transformations) {
+				t.toStreamNice(dout);
+			}
+		}
 		this.updateTransformationMatrix();
 		this.recalculateVolume();
 	}
@@ -100,7 +102,7 @@ class Scene {
 			return 0;
 		}
 
-		void drawDisplayList() {
+		void fillDisplayList() {
 			for(int i = 0; i < POINTS_PER_ITERATION; i++) {
 				colorBuffer[i][0] = getColor(0);
 				colorBuffer[i][1] = getColor(1);
@@ -120,7 +122,9 @@ class Scene {
 					moveStack[moveStack.length - 1] = lastTr;
 				}
 			}
+		}
 
+		void drawDisplayList() {
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_COLOR_ARRAY);
 			glVertexPointer(3, GL_FLOAT, 0, positions.ptr);
@@ -128,9 +132,9 @@ class Scene {
 			glDrawArrays(GL_POINTS, 0, positions.length / 3);
 		}
 
+		fillDisplayList();
+
 		if(drawToFeedbackBuffer) {
-			debug
-				write(":");
 			glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR,
 					feedbackBuffer.ptr);
 			glRenderMode(GL_FEEDBACK);
@@ -140,8 +144,6 @@ class Scene {
 		int size = glRenderMode(GL_RENDER);
 
 		if(drawToFeedbackBuffer) {
-			debug
-				write(";");
 			float
 					mx = cast(float) global.conf.getIntParam("picResX") / global.conf.getIntParam(
 							"resX");
@@ -528,11 +530,12 @@ class Scene {
 		[155, 000, 055]
 	, ];
 
-	const int POINTS_PER_ITERATION = 10000;
+	const int POINTS_PER_ITERATION = 10_000;
 
 	FIBITMAP* buffer;
 	float[][] zBuffer;
 
+	//positions and colorBuffer is used for display lists
 	static float[3][] positions;
 	static ubyte[3][] colorBuffer;
 	static short[] moveStack;
