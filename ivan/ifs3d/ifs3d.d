@@ -24,6 +24,8 @@ pragma(lib, "opengl32.lib");
 pragma(lib, "glu32.lib");
 pragma(lib, "freeimage.lib");
 
+//version = log_mouse_events;
+
 static this() {
 	setCallbackDelegates();
 }
@@ -67,7 +69,7 @@ int main(string[] args) {
 		}
 
 		glfwSwapBuffers();
-		global.o.flush();
+		//		global.o.flush();
 
 		processMouseEvents();
 	};
@@ -189,25 +191,27 @@ void setCallbackDelegates() {
 
 	callback.mouseWheel = (int pos) {
 		debug
-			writefln("Mouse scroll: ", pos);
+			version(log_mouse_events)
+				writefln("Mouse: scroll: %s", pos);
 		mouse.WheelDelta = pos - mouse.WheelPos;
 		mouse.WheelPos = pos;
 	};
 
 	callback.mousePos = (int x, int y) {
-		static counter = 0;
 		mouse.XDelta = x - mouse.X;
 		mouse.YDelta = y - mouse.Y;
 		debug
-			writefln("Mouse: pos(%s, %s), delta(%s, %s), %s", x, y,
-					mouse.XDelta, mouse.YDelta, counter++);
+			version(log_mouse_events)
+				writefln("Mouse: pos(%s, %s), delta(%s, %s)", x, y,
+						mouse.XDelta, mouse.YDelta);
 		mouse.X = x;
 		mouse.Y = y;
 	};
 
 	callback.mouseButton = (int button, int action) {
 		debug
-			writefln("Mouse button: ", button, ", ", action);
+			version(log_mouse_events)
+				writefln("Mouse: button: %s, action: %s", button, action);
 
 		mouse.LeftOld = mouse.Left;
 		mouse.RightOld = mouse.Right;
@@ -232,13 +236,15 @@ void setCallbackDelegates() {
 
 	callback.keyCallback = (int key, int action) {
 		debug
-			writefln("Key: ", key, ", ", action);
+			version(log_mouse_events)
+				writefln("Key: ", key, ", ", action);
 		keys.update(key, action);
 	};
 
 	callback.characterCallback = (int character, int state) {
 		debug
-			writefln("Character: ", character, ", ", state);
+			version(log_mouse_events)
+				writefln("Character: ", character, ", ", state);
 		char c = cast(char) character;
 		if(state == GLFW_PRESS) {
 			switch(c) {
@@ -277,7 +283,8 @@ void setCallbackDelegates() {
 				break;
 				case 'b': {
 					debug
-						global.o.writefln("Character == ", c);
+						version(log_mouse_events)
+							writefln("Character == ", c);
 
 					if(bgColor is bgColorWhite)
 						bgColor = bgColorBlack;

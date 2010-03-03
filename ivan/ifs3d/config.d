@@ -30,12 +30,12 @@ class Config {
 		intParams["picSmallY"] = 768;
 
 		if(std.file.exists(fileName)) {
-			//			debug
-			//				global.o.writefln("Config file found, loading...");
+			debug
+				global.o.writefln("Config file found, loading...");
 			loadConfigFile(fileName);
 		} else {
-			//			debug
-			//				global.o.writefln("Config file not found, creating...");
+			debug
+				global.o.writefln("Config file not found, creating...");
 			saveConfigFile(fileName);
 		}
 

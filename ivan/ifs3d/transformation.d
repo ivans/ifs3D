@@ -9,7 +9,7 @@ private {
 	import ivan.ifs3d.types;
 }
 
-//version = draw_transformation_star_point;
+//version = draw_transformation_start_point;
 
 class Transformation {
 
@@ -30,16 +30,16 @@ class Transformation {
 	this(ifsfloat x, ifsfloat y, ifsfloat z, ifsfloat wx, ifsfloat wy,
 			ifsfloat wz, ifsfloat ra, ifsfloat rx, ifsfloat ry, ifsfloat rz,
 			int func) {
-		X = x;
-		Y = y;
-		Z = z;
-		Wx = wx;
-		Wy = wy;
-		Wz = wz;
-		Ra = ra;
-		Rx = rx;
-		Ry = ry;
-		Rz = rz;
+		X_ = x;
+		Y_ = y;
+		Z_ = z;
+		Wx_ = wx;
+		Wy_ = wy;
+		Wz_ = wz;
+		Ra_ = ra;
+		Rx_ = rx;
+		Ry_ = ry;
+		Rz_ = rz;
 		this.func = func;
 	}
 
@@ -78,14 +78,14 @@ class Transformation {
 		}
 
 		ifsfloat[3][8] tocke = void;
-		transform(X, Y, Z, tocke[0]);
-		transform(X + Wx, Y, Z, tocke[1]);
-		transform(X + Wx, Y, Z + Wz, tocke[2]);
-		transform(X, Y, Z + Wz, tocke[3]);
-		transform(X, Y + Wy, Z, tocke[4]);
-		transform(X + Wx, Y + Wy, Z, tocke[5]);
-		transform(X + Wx, Y + Wy, Z + Wz, tocke[6]);
-		transform(X, Y + Wy, Z + Wz, tocke[7]);
+		transform(X_, Y_, Z_, tocke[0]);
+		transform(X_ + Wx_, Y_, Z_, tocke[1]);
+		transform(X_ + Wx_, Y_, Z_ + Wz_, tocke[2]);
+		transform(X_, Y_, Z_ + Wz_, tocke[3]);
+		transform(X_, Y_ + Wy_, Z_, tocke[4]);
+		transform(X_ + Wx_, Y_ + Wy_, Z_, tocke[5]);
+		transform(X_ + Wx_, Y_ + Wy_, Z_ + Wz_, tocke[6]);
+		transform(X_, Y_ + Wy_, Z_ + Wz_, tocke[7]);
 
 		glColor3f(r, g, b);
 		glBegin(GL_LINE_LOOP);
@@ -106,7 +106,7 @@ class Transformation {
 			glVertex3f(tocke[4 + i][0], tocke[4 + i][1], tocke[4 + i][2]);
 		}
 		glEnd();
-		version(draw_transformation_star_point) {
+		version(draw_transformation_start_point) {
 			glPointSize(5);
 			glBegin(GL_POINTS);
 			glColor3f(1, 0, 0);
@@ -264,8 +264,9 @@ class Transformation {
 	//transform from 'from' to 'this'
 	private void CalculateTransformationMatrix(Transformation from,
 			ref ifsfloat[4][4] mat) {
-		//		debug
-		//			writefln("Calculating transformation matrix:");
+		static counter = 0;
+		debug
+			writefln("Calculating transformation matrix %s", counter++);
 		Transformation to = this;
 		ifsfloat[4][4] M1 = [
 			[1, 0, 0, -from.X],
@@ -302,7 +303,8 @@ class Transformation {
 
 	}
 
-	void Mul4Matrix(ifsfloat[4][4] a, ifsfloat[4][4] b, ref ifsfloat[4][4] c) {
+	void Mul4Matrix(ref const(ifsfloat[4][4]) a, ref const(ifsfloat[4][4]) b,
+			ref ifsfloat[4][4] c) {
 		ifsfloat sum;
 		for(int row = 0; row < 4; row++) {
 			for(int col = 0; col < 4; col++) {

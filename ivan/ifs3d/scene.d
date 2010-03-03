@@ -65,7 +65,6 @@ class Scene {
 		glColor3f(1, 1, 1);
 		glVertex3f(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
 		glEnd();
-		glPointSize(1);
 	}
 
 	void draw() {
@@ -82,9 +81,8 @@ class Scene {
 
 		ubyte getColor(int index) {
 			int suma = 0;
-			//real mult = 1.0;
 			for(int i = moveStack.length - 1; i >= 0; i--) {
-				suma += cast(int) (colors[(moveStack[i]) % colors.length][index]/**mult*/);
+				suma += cast(int) (colors[(moveStack[i]) % colors.length][index]);
 			}
 			return cast(ubyte) (suma / moveStack.length);
 		}
@@ -125,6 +123,7 @@ class Scene {
 		}
 
 		void drawDisplayList() {
+			glPointSize(1);
 			glEnableClientState(GL_VERTEX_ARRAY);
 			glEnableClientState(GL_COLOR_ARRAY);
 			glVertexPointer(3, GL_FLOAT, 0, positions.ptr);
@@ -174,11 +173,8 @@ class Scene {
 				}
 			}
 		}
-		debug
-			write("-");
+
 		drawDisplayList();
-		debug
-			writeln("_");
 	}
 
 	void clearImageBufferToBackgroundColor() {
@@ -197,24 +193,16 @@ class Scene {
 	}
 
 	public void increaseStack() {
-		//		debug
-		//			writef("inc stack: ");
 		synchronized(this)
 			moveStack.length = moveStack.length + 1;
-		//		debug
-		//			writeln(moveStack.length);
 	}
 
 	public void decreaseStack() {
-		//		debug
-		//			writef("dec stack: ");
 		int size = moveStack.length - 1;
 		if(size > 0) {
 			synchronized(this)
 				moveStack.length = size;
 		}
-		//		debug
-		//			writeln(moveStack.length);
 	}
 
 	void addTr(Transformation t) {
@@ -245,9 +233,10 @@ class Scene {
 	}
 
 	public void ZoomCamera(int mouseYDelta) {
-		//		debug
-		//			writefln(cameraPosition.toString, " ", cameraLookAt.toString, " ",
-		//					mouseYDelta);
+		debug
+			writefln(
+					"ZoomCamera, cameraPos = %s, cameraLookAt = %s, mouseYDela = %s",
+					cameraPosition, cameraLookAt, mouseYDelta);
 		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
 		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
 		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
@@ -313,12 +302,7 @@ class Scene {
 		transformations[selectedTrans].Wy = transformations[selectedTrans].Wy - dy * len / 1000f;
 		transformations[selectedTrans].Wz = transformations[selectedTrans].Wz - dx * vx * len / 1000f;
 
-		if(selectedTrans == 0) {
-			this.updateTransformationMatrix();
-		} else {
-			transformations[selectedTrans].CalculateTransformationMatrix2(
-					transformations[0]);
-		}
+		updateSomeOfTransformationMatrix();
 		this.recalculateVolume();
 	}
 
@@ -339,12 +323,7 @@ class Scene {
 		transformations[selectedTrans].Y = transformations[selectedTrans].Y - len * dy * (vx * vx + vz * vz) / 1000f;
 		transformations[selectedTrans].Z = transformations[selectedTrans].Z + len * dy * -vy * vz / 1000f;
 
-		if(selectedTrans == 0) {
-			this.updateTransformationMatrix();
-		} else {
-			transformations[selectedTrans].CalculateTransformationMatrix2(
-					transformations[0]);
-		}
+		updateSomeOfTransformationMatrix();
 		this.recalculateVolume();
 	}
 
@@ -403,26 +382,26 @@ class Scene {
 
 		synchronized(this) {
 			transformations = novi;
-			if(selectedTrans == 0) {
-				this.updateTransformationMatrix();
-			} else {
-				transformations[selectedTrans].CalculateTransformationMatrix2(
-						transformations[0]);
-			}
+			updateSomeOfTransformationMatrix();
 		}
 		moveStack[] = 0;
 		this.recalculateVolume();
 	}
 
-	void rotateSelected(int sign) {
-		transformations[selectedTrans].Ra = sign * PI / 32 + transformations[selectedTrans].Ra;
+	void updateSomeOfTransformationMatrix() {
 		if(selectedTrans == 0) {
 			this.updateTransformationMatrix();
 		} else {
 			transformations[selectedTrans].CalculateTransformationMatrix2(
 					transformations[0]);
 		}
-		this.recalculateVolume();
+	}
+
+	void rotateSelected(int sign) {
+		transformations[selectedTrans].Ra = sign * PI / 32 + transformations[selectedTrans].Ra;
+		updateSomeOfTransformationMatrix();
+		//TODO provjeriti ali mislim da mi ovo ne treba jer se ne mijenja Wx, Wy ili Wz
+		//		this.recalculateVolume();
 	}
 
 	void changeFunctionOfSelected(int direction) {
