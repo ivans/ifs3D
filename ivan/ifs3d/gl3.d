@@ -9,6 +9,8 @@ string getMethodPointer(string name) {
     ";
 }
 
+version = GL_VERSION_2_0;
+
 extern(System):
 
 	alias uint GLenum;
@@ -26,6 +28,7 @@ extern(System):
 	alias double GLdouble;
 	alias double GLclampd;
 	alias void GLvoid;
+	alias char GLchar;
 
 	/* AttribMask */
 	const uint GL_DEPTH_BUFFER_BIT = 0x00000100;
@@ -253,9 +256,88 @@ extern(System):
 	const uint GL_RGBA12 = 0x805A;
 	const uint GL_RGBA16 = 0x805B;
 
-	//TODO nastaviti dalje...
-
-	const uint GL_VERTEX_SHADER = 0x8B31;
+	version(GL_VERSION_2_0) {
+		const uint GL_BLEND_EQUATION_RGB = 0x8009;
+		const uint GL_VERTEX_ATTRIB_ARRAY_ENABLED = 0x8622;
+		const uint GL_VERTEX_ATTRIB_ARRAY_SIZE = 0x8623;
+		const uint GL_VERTEX_ATTRIB_ARRAY_STRIDE = 0x8624;
+		const uint GL_VERTEX_ATTRIB_ARRAY_TYPE = 0x8625;
+		const uint GL_CURRENT_VERTEX_ATTRIB = 0x8626;
+		const uint GL_VERTEX_PROGRAM_POINT_SIZE = 0x8642;
+		const uint GL_VERTEX_ATTRIB_ARRAY_POINTER = 0x8645;
+		const uint GL_STENCIL_BACK_FUNC = 0x8800;
+		const uint GL_STENCIL_BACK_FAIL = 0x8801;
+		const uint GL_STENCIL_BACK_PASS_DEPTH_FAIL = 0x8802;
+		const uint GL_STENCIL_BACK_PASS_DEPTH_PASS = 0x8803;
+		const uint GL_MAX_DRAW_BUFFERS = 0x8824;
+		const uint GL_DRAW_BUFFER0 = 0x8825;
+		const uint GL_DRAW_BUFFER1 = 0x8826;
+		const uint GL_DRAW_BUFFER2 = 0x8827;
+		const uint GL_DRAW_BUFFER3 = 0x8828;
+		const uint GL_DRAW_BUFFER4 = 0x8829;
+		const uint GL_DRAW_BUFFER5 = 0x882A;
+		const uint GL_DRAW_BUFFER6 = 0x882B;
+		const uint GL_DRAW_BUFFER7 = 0x882C;
+		const uint GL_DRAW_BUFFER8 = 0x882D;
+		const uint GL_DRAW_BUFFER9 = 0x882E;
+		const uint GL_DRAW_BUFFER10 = 0x882F;
+		const uint GL_DRAW_BUFFER11 = 0x8830;
+		const uint GL_DRAW_BUFFER12 = 0x8831;
+		const uint GL_DRAW_BUFFER13 = 0x8832;
+		const uint GL_DRAW_BUFFER14 = 0x8833;
+		const uint GL_DRAW_BUFFER15 = 0x8834;
+		const uint GL_BLEND_EQUATION_ALPHA = 0x883D;
+		const uint GL_MAX_VERTEX_ATTRIBS = 0x8869;
+		const uint GL_VERTEX_ATTRIB_ARRAY_NORMALIZED = 0x886A;
+		const uint GL_MAX_TEXTURE_IMAGE_UNITS = 0x8872;
+		const uint GL_FRAGMENT_SHADER = 0x8B30;
+		const uint GL_VERTEX_SHADER = 0x8B31;
+		const uint GL_MAX_FRAGMENT_UNIFORM_COMPONENTS = 0x8B49;
+		const uint GL_MAX_VERTEX_UNIFORM_COMPONENTS = 0x8B4A;
+		const uint GL_MAX_VARYING_FLOATS = 0x8B4B;
+		const uint GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS = 0x8B4C;
+		const uint GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8B4D;
+		const uint GL_SHADER_TYPE = 0x8B4F;
+		const uint GL_FLOAT_VEC2 = 0x8B50;
+		const uint GL_FLOAT_VEC3 = 0x8B51;
+		const uint GL_FLOAT_VEC4 = 0x8B52;
+		const uint GL_INT_VEC2 = 0x8B53;
+		const uint GL_INT_VEC3 = 0x8B54;
+		const uint GL_INT_VEC4 = 0x8B55;
+		const uint GL_BOOL = 0x8B56;
+		const uint GL_BOOL_VEC2 = 0x8B57;
+		const uint GL_BOOL_VEC3 = 0x8B58;
+		const uint GL_BOOL_VEC4 = 0x8B59;
+		const uint GL_FLOAT_MAT2 = 0x8B5A;
+		const uint GL_FLOAT_MAT3 = 0x8B5B;
+		const uint GL_FLOAT_MAT4 = 0x8B5C;
+		const uint GL_SAMPLER_1D = 0x8B5D;
+		const uint GL_SAMPLER_2D = 0x8B5E;
+		const uint GL_SAMPLER_3D = 0x8B5F;
+		const uint GL_SAMPLER_CUBE = 0x8B60;
+		const uint GL_SAMPLER_1D_SHADOW = 0x8B61;
+		const uint GL_SAMPLER_2D_SHADOW = 0x8B62;
+		const uint GL_DELETE_STATUS = 0x8B80;
+		const uint GL_COMPILE_STATUS = 0x8B81;
+		const uint GL_LINK_STATUS = 0x8B82;
+		const uint GL_VALIDATE_STATUS = 0x8B83;
+		const uint GL_INFO_LOG_LENGTH = 0x8B84;
+		const uint GL_ATTACHED_SHADERS = 0x8B85;
+		const uint GL_ACTIVE_UNIFORMS = 0x8B86;
+		const uint GL_ACTIVE_UNIFORM_MAX_LENGTH = 0x8B87;
+		const uint GL_SHADER_SOURCE_LENGTH = 0x8B88;
+		const uint GL_ACTIVE_ATTRIBUTES = 0x8B89;
+		const uint GL_ACTIVE_ATTRIBUTE_MAX_LENGTH = 0x8B8A;
+		const uint GL_FRAGMENT_SHADER_DERIVATIVE_HINT = 0x8B8B;
+		const uint GL_SHADING_LANGUAGE_VERSION = 0x8B8C;
+		const uint GL_CURRENT_PROGRAM = 0x8B8D;
+		const uint GL_POINT_SPRITE_COORD_ORIGIN = 0x8CA0;
+		const uint GL_LOWER_LEFT = 0x8CA1;
+		const uint GL_UPPER_LEFT = 0x8CA2;
+		const uint GL_STENCIL_BACK_REF = 0x8CA3;
+		const uint GL_STENCIL_BACK_VALUE_MASK = 0x8CA4;
+		const uint GL_STENCIL_BACK_WRITEMASK = 0x8CA5;
+	}
 
 	alias uint GLhandleARB;
 
@@ -267,3 +349,21 @@ extern(System):
 	GLvoid function(GLuint shader) glCompileShader;
 
 	GLuint function() glCreateProgram;
+
+	GLvoid function(GLuint program, GLuint shader) glAttachShader;
+
+	GLvoid function(GLuint program) glLinkProgram;
+
+	GLvoid function(GLuint prog) glUseProgram;
+
+	GLboolean function(GLuint shader) glIsShader;
+
+	GLvoid function(GLuint shader, GLenum pname, GLint* params) glGetShaderiv;
+
+	GLvoid function(GLuint program, GLenum pname, GLint* params) glGetProgramiv;
+
+	GLvoid function(GLuint shader, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
+			glGetShaderInfoLog;
+
+	GLvoid function(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
+			glGetProgramInfoLog;

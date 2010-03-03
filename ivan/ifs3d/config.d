@@ -107,43 +107,96 @@ class Config {
 		return ret;
 	}
 
+	void printLog(string msg, GLuint obj) {
+		int infologLength = 0;
+		int maxLength;
+
+		if(gl3.glIsShader(obj))
+			gl3.glGetShaderiv(obj, gl3.GL_INFO_LOG_LENGTH, &maxLength);
+		else
+			gl3.glGetProgramiv(obj, gl3.GL_INFO_LOG_LENGTH, &maxLength);
+
+		char[] infoLog = new char[](maxLength);
+
+		if(gl3.glIsShader(obj))
+			gl3.glGetShaderInfoLog(obj, maxLength, &infologLength, infoLog.ptr);
+		else
+			gl3.glGetProgramInfoLog(obj, maxLength, &infologLength, infoLog.ptr);
+
+		if(infologLength > 0)
+			writefln("%s %s\n", msg, infoLog);
+	}
+
 	void initGlExtensionMethods() {
 		if(testExtension("GL_ARB_vertex_shader") == 1 && testExtension(
 				"GL_ARB_fragment_shader") == 1) {
-			//			debug
-			//				writefln(
-			//						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+			debug
+				writefln(
+						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 
-			//			mixin(gl3.getMethodPointer("glCreateShader"));
-			//			mixin(gl3.getMethodPointer("glShaderSource"));
-			//			mixin(gl3.getMethodPointer("glCompileShader"));
-			//			mixin(gl3.getMethodPointer("glCreateProgram"));
-			//
-			//			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
-			//
-			//			GLuint shader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
-			//
-			//			string
-			//					shaderSrc = "
-			//		void main(void)
-			//		{
-			//			vec4 v = vec4(gl_Vertex);		
-			//			v.z = 0.0;
-			//			
-			//			gl_Position = gl_ModelViewProjectionMatrix * v;
-			//		}";
-			//
-			//			writefln("Shader = %s, with source = %s", shader, shaderSrc);
-			//
-			//			char* src = cast(char*) &shaderSrc[0];
-			//
-			//			gl3.glShaderSource(shader, 1, &src, null);
-			//			gl3.glCompileShader(shader);
-			//			writeln("After shader source i compile");
+			mixin(gl3.getMethodPointer("glCreateShader"));
+			mixin(gl3.getMethodPointer("glShaderSource"));
+			mixin(gl3.getMethodPointer("glCompileShader"));
+			mixin(gl3.getMethodPointer("glCreateProgram"));
+			mixin(gl3.getMethodPointer("glAttachShader"));
+			mixin(gl3.getMethodPointer("glLinkProgram"));
+			mixin(gl3.getMethodPointer("glUseProgram"));
+
+			mixin(gl3.getMethodPointer("glIsShader"));
+			mixin(gl3.getMethodPointer("glGetShaderiv"));
+			mixin(gl3.getMethodPointer("glGetProgramiv"));
+			mixin(gl3.getMethodPointer("glGetShaderInfoLog"));
+			mixin(gl3.getMethodPointer("glGetProgramInfoLog"));
+
+			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
+
+			GLuint vertexShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+			GLuint fragmentShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+
+			string
+					vertexShaderSrc = "
+					void main(void)
+					{
+						vec4 v = vec4(gl_Vertex);		
+						v.z = sin(5.0*v.x )*0.25;
+						gl_Position = gl_ModelViewProjectionMatrix * v;
+					}";
+
+			writefln("Shader = %s, with source = %s", vertexShader,
+					vertexShaderSrc);
+
+			string
+					fragmentShaderSrc = "
+					void main(void)
+					{
+//						gl_FragColor = gl_Color;
+					}";
+
+			writefln("Shader = %s, with source = %s", fragmentShader,
+					fragmentShaderSrc);
+
+			char* srcVertexShader = cast(char*) &vertexShaderSrc[0];
+			char* srcFragmentShader = cast(char*) &fragmentShaderSrc[0];
+
+			gl3.glShaderSource(vertexShader, 1, &srcVertexShader, null);
+			gl3.glShaderSource(fragmentShader, 1, &srcFragmentShader, null);
+			gl3.glCompileShader(vertexShader);
+			printLog("vertexShader: ", vertexShader);
+			gl3.glCompileShader(fragmentShader);
+			printLog("fragmentShader: ", fragmentShader);
+
+			auto p = gl3.glCreateProgram();
+			gl3.glAttachShader(p, vertexShader);
+			gl3.glAttachShader(p, fragmentShader);
+			gl3.glLinkProgram(p);
+			printLog("program: ", p);
+			gl3.glUseProgram(p);
+
+			writeln("After shader source i compile");
 		} else {
-			//			debug
-			//				writefln(
-			//						"Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+			debug
+				writefln(
+						"Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 		}
 
 	}
