@@ -99,6 +99,14 @@ RGBQUAD* getColor(ubyte r, ubyte g, ubyte b) {
 	return &thePixel;
 }
 
+RGBQUAD* getColor(ubyte r, ubyte g, ubyte b, ubyte a) {
+	thePixel.rgbBlue = r;
+	thePixel.rgbGreen = g;
+	thePixel.rgbRed = b;
+	thePixel.rgbReserved = a;
+	return &thePixel;
+}
+
 RGBQUAD* getColor(float r, float g, float b) {
 	thePixel.rgbBlue = cast(ubyte) (r * 255);
 	thePixel.rgbGreen = cast(ubyte) (g * 255);
@@ -115,11 +123,11 @@ GLint writeJpeg(string fileName) {
 	// Get the viewport dimensions
 	glGetIntegerv(GL_VIEWPORT, iViewport.ptr);
 
-	lImageSize = iViewport[2] * 3 * iViewport[3];
+	lImageSize = iViewport[2] * 4 * iViewport[3];
 
 	//	debug
 	//		writefln("Image size: %s x %s", iViewport[2], iViewport[3]);
-	FIBITMAP* thePicture = FreeImage_Allocate(iViewport[2], iViewport[3], 24);
+	FIBITMAP* thePicture = FreeImage_Allocate(iViewport[2], iViewport[3], 32);
 
 	pBits.length = lImageSize;
 
@@ -130,20 +138,21 @@ GLint writeJpeg(string fileName) {
 
 	glGetIntegerv(GL_READ_BUFFER, cast(int*) &lastBuffer);
 	glReadBuffer(GL_FRONT);
-	glReadPixels(0, 0, iViewport[2], iViewport[3], GL_BGR_EXT,
+	glReadPixels(0, 0, iViewport[2], iViewport[3], GL_BGRA_EXT,
 			GL_UNSIGNED_BYTE, pBits.ptr);
 	glReadBuffer(lastBuffer);
 
 	for(uint y = 0; y < iViewport[3]; y++) {
 		for(uint x = 0; x < iViewport[2]; x++) {
 			FreeImage_SetPixelColor(thePicture, x, y,
-					cast(RGBQUAD*) &pBits[x * 3 + 3 * y * iViewport[2]]);
+					cast(RGBQUAD*) &pBits[x * 4 + 4 * y * iViewport[2]]);
 		}
 	}
 
-	FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, thePicture,
+	FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(thePicture);
+	FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
 			cast(char*) (fileName ~ "\0"), JPEG_QUALITYSUPERB);
-
+	FreeImage_Unload(nova24bit);
 	FreeImage_Unload(thePicture);
 
 	return 1;

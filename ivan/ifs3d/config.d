@@ -151,14 +151,16 @@ class Config {
 			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
 
 			GLuint vertexShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
-			GLuint fragmentShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+			GLuint fragmentShader = gl3.glCreateShader(gl3.GL_FRAGMENT_SHADER);
 
 			string
 					vertexShaderSrc = "
 					void main(void)
 					{
 						vec4 v = vec4(gl_Vertex);		
-						v.z = sin(5.0*v.x )*0.25;
+						v.z = v.z + sin(v.x*v.x + v.y*v.y)/10;
+						gl_Normal = 0;
+						gl_Normal.z = -1;
 						gl_Position = gl_ModelViewProjectionMatrix * v;
 					}";
 
@@ -169,7 +171,8 @@ class Config {
 					fragmentShaderSrc = "
 					void main(void)
 					{
-//						gl_FragColor = gl_Color;
+						gl_FragColor = gl_Color;
+						gl_FragColor.a = sin(gl_FragCoord.w);
 					}";
 
 			writefln("Shader = %s, with source = %s", fragmentShader,
@@ -186,8 +189,8 @@ class Config {
 			printLog("fragmentShader: ", fragmentShader);
 
 			auto p = gl3.glCreateProgram();
-			gl3.glAttachShader(p, vertexShader);
 			gl3.glAttachShader(p, fragmentShader);
+			gl3.glAttachShader(p, vertexShader);
 			gl3.glLinkProgram(p);
 			printLog("program: ", p);
 			gl3.glUseProgram(p);
@@ -259,6 +262,8 @@ class Config {
 		glPolygonMode(GL_BACK, GL_LINE);
 
 		glClearDepth(1.0f);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_POINT_SMOOTH);

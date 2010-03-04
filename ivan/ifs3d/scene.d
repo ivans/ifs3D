@@ -19,7 +19,7 @@ class Scene {
 		cameraLookAt = Point(0, 0, 0);
 		int w = global.conf.getIntParam("picResX");
 		int h = global.conf.getIntParam("picResY");
-		buffer = FreeImage_Allocate(w, h, 24);
+		buffer = FreeImage_Allocate(w, h, 32);
 		zBuffer = new float[][](w, h);
 		clearImageBufferToBackgroundColor;
 	}
@@ -168,7 +168,8 @@ class Scene {
 								ivan.ifs3d.writetga.getColor(
 										cast(ubyte) (feedbackBuffer[i + 6] * 255),
 										cast(ubyte) (feedbackBuffer[i + 5] * 255),
-										cast(ubyte) (feedbackBuffer[i + 4] * 255)));
+										cast(ubyte) (feedbackBuffer[i + 4] * 255),
+										cast(ubyte) (feedbackBuffer[i + 7] * 255)));
 					}
 				}
 			}
@@ -435,35 +436,40 @@ class Scene {
 		global.o.flush();
 		this.toStream(new std.stream.File(definition, FileMode.Out));
 
-		global.o.writef(std.string.format("Saving high res (%sx%s) image...",
-				global.conf.getIntParam("picResX"), global.conf.getIntParam(
-						"picResY")));
-		global.o.flush();
-		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, buffer,
-				cast(char*) pictureHighres, JPEG_QUALITYSUPERB);
-		global.o.writefln(" done");
-
-		FIBITMAP* pict32bit = FreeImage_ConvertTo32Bits(buffer);
-		FreeImage_AdjustGamma(pict32bit,
-				(global.conf.getIntParam("adjGamma") + 100) / 20);
-		FreeImage_AdjustBrightness(pict32bit, global.conf.getIntParam(
-				"adjBrightness"));
-		FreeImage_AdjustContrast(pict32bit, global.conf.getIntParam(
-				"adjContrast"));
-		FIBITMAP* nova = FreeImage_Rescale(pict32bit, global.conf.getIntParam(
-				"picSmallX"), global.conf.getIntParam("picSmallY"),
-				FREE_IMAGE_FILTER.FILTER_BICUBIC);
-		FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(nova);
-		global.o.writef(std.string.format("Saving resampled (%sx%s) image...",
-				global.conf.getIntParam("picSmallX"), global.conf.getIntParam(
-						"picSmallY")));
-		global.o.flush();
+		FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(buffer);
 		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
 				cast(char*) pictureBicubic, JPEG_QUALITYSUPERB);
-		global.o.writefln(" done");
-		FreeImage_Unload(nova);
 		FreeImage_Unload(nova24bit);
-		FreeImage_Unload(pict32bit);
+
+		//		global.o.writef(std.string.format("Saving high res (%sx%s) image...",
+		//				global.conf.getIntParam("picResX"), global.conf.getIntParam(
+		//						"picResY")));
+		//		global.o.flush();
+		//		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, buffer,
+		//				cast(char*) pictureHighres, JPEG_QUALITYSUPERB);
+		//		global.o.writefln(" done");
+		//
+		//		FIBITMAP* pict32bit = FreeImage_ConvertTo32Bits(buffer);
+		//		FreeImage_AdjustGamma(pict32bit,
+		//				(global.conf.getIntParam("adjGamma") + 100) / 20);
+		//		FreeImage_AdjustBrightness(pict32bit, global.conf.getIntParam(
+		//				"adjBrightness"));
+		//		FreeImage_AdjustContrast(pict32bit, global.conf.getIntParam(
+		//				"adjContrast"));
+		//		FIBITMAP* nova = FreeImage_Rescale(pict32bit, global.conf.getIntParam(
+		//				"picSmallX"), global.conf.getIntParam("picSmallY"),
+		//				FREE_IMAGE_FILTER.FILTER_BICUBIC);
+		//		FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(nova);
+		//		global.o.writef(std.string.format("Saving resampled (%sx%s) image...",
+		//				global.conf.getIntParam("picSmallX"), global.conf.getIntParam(
+		//						"picSmallY")));
+		//		global.o.flush();
+		//		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
+		//				cast(char*) pictureBicubic, JPEG_QUALITYSUPERB);
+		//		global.o.writefln(" done");
+		//		FreeImage_Unload(nova);
+		//		FreeImage_Unload(nova24bit);
+		//		FreeImage_Unload(pict32bit);
 
 		global.o.writef("Saving screen capture image...");
 		global.o.flush();
