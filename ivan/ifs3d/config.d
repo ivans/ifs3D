@@ -155,11 +155,12 @@ class Config {
 
 			string
 					vertexShaderSrc = "
-					void main(void)
-					{
-						vec4 v = vec4(gl_Vertex);		
-						v.z = v.z + sin(v.x*v.x + v.y*v.y)/10;
+					void main()
+					{ 
+						vec4 v = vec4(gl_Vertex);
+						v.z = v.z + sin(v.x*v.x + v.y*v.y)/10.0;
 						gl_Position = gl_ModelViewProjectionMatrix * v;
+						gl_FrontColor = gl_Color;
 					}";
 
 			writefln("Shader = %s, with source = %s", vertexShader,
@@ -167,10 +168,11 @@ class Config {
 
 			string
 					fragmentShaderSrc = "
-					void main(void)
+					#version 120 
+					void main()
 					{
-						gl_FragColor = gl_Color;
-						gl_FragColor.a = sin(gl_FragCoord.w);
+						vec4 myOutputColor = gl_Color;
+						gl_FragColor = myOutputColor;
 					}";
 
 			writefln("Shader = %s, with source = %s", fragmentShader,
@@ -187,8 +189,8 @@ class Config {
 			printLog("fragmentShader: ", fragmentShader);
 
 			auto p = gl3.glCreateProgram();
-			gl3.glAttachShader(p, fragmentShader);
 			gl3.glAttachShader(p, vertexShader);
+			gl3.glAttachShader(p, fragmentShader);
 			gl3.glLinkProgram(p);
 			printLog("program: ", p);
 			gl3.glUseProgram(p);
