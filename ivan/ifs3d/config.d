@@ -153,27 +153,12 @@ class Config {
 			GLuint vertexShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
 			GLuint fragmentShader = gl3.glCreateShader(gl3.GL_FRAGMENT_SHADER);
 
-			string
-					vertexShaderSrc = "
-					void main()
-					{ 
-						vec4 v = vec4(gl_Vertex);
-						v.z = v.z + sin(v.x*v.x + v.y*v.y)/10.0;
-						gl_Position = gl_ModelViewProjectionMatrix * v;
-						gl_FrontColor = gl_Color;
-					}";
+			string vertexShaderSrc = import("vertexShader.glsl");
 
 			writefln("Shader = %s, with source = %s", vertexShader,
 					vertexShaderSrc);
 
-			string
-					fragmentShaderSrc = "
-					#version 120 
-					void main()
-					{
-						vec4 myOutputColor = gl_Color;
-						gl_FragColor = myOutputColor;
-					}";
+			string fragmentShaderSrc = import("fragmentShader.glsl");
 
 			writefln("Shader = %s, with source = %s", fragmentShader,
 					fragmentShaderSrc);
@@ -267,7 +252,7 @@ class Config {
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
 		glEnable(GL_POINT_SMOOTH);
-		glDrawBuffer(GL_FRONT_AND_BACK);
+		//glDrawBuffer(GL_FRONT_AND_BACK);
 	}
 
 	void terminateGlfw() {
