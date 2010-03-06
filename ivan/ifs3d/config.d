@@ -148,6 +148,11 @@ class Config {
 			mixin(gl3.getMethodPointer("glGetShaderInfoLog"));
 			mixin(gl3.getMethodPointer("glGetProgramInfoLog"));
 
+			mixin(gl3.getMethodPointer("glGetUniformLocation"));
+			mixin(gl3.getMethodPointer("glUniform3fv"));
+			mixin(gl3.getMethodPointer("glUniform3f"));
+			mixin(gl3.getMethodPointer("glUniform1f"));
+
 			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
 
 			GLuint vertexShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
@@ -177,6 +182,11 @@ class Config {
 			gl3.glAttachShader(p, vertexShader);
 			gl3.glAttachShader(p, fragmentShader);
 			gl3.glLinkProgram(p);
+
+			global.glslCameraPosition = gl3.glGetUniformLocation(p,
+					"CameraPosition");
+			global.glslFadeOffDist = gl3.glGetUniformLocation(p, "FadeOffDist");
+
 			printLog("program: ", p);
 			gl3.glUseProgram(p);
 
@@ -251,8 +261,8 @@ class Config {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
-		glEnable(GL_POINT_SMOOTH);
-		//glDrawBuffer(GL_FRONT_AND_BACK);
+		//glEnable(GL_POINT_SMOOTH);
+		glDrawBuffer(GL_FRONT_AND_BACK);
 	}
 
 	void terminateGlfw() {

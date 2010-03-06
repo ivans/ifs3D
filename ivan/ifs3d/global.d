@@ -24,6 +24,10 @@ package float[3] bgColorBlack = [0, 0, 0];
 package float[3] bgColorWhite = [1, 1, 1];
 package float[] bgColor;
 
+package int glslCameraPosition;
+package int glslFadeOffDist;
+package float fadeOffDist = 50;
+
 alias std.cstream.dout o;
 
 static this() {
@@ -40,6 +44,6 @@ void init() {
 	mouse = new MouseState;
 	keys = new KeysState;
 	scene = new Scene;
-	consoleThread = new ConsoleThread;
-	consoleThread.start;
+	//consoleThread = new ConsoleThread;
+	//consoleThread.start;
 }

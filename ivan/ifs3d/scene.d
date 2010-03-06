@@ -13,14 +13,18 @@ private {
 	import ivan.ifs3d.types;
 }
 
+//version = in_mem_buffer_with_z;
+
 class Scene {
 	this() {
 		cameraPosition = Point(0.5, 3, 10);
 		cameraLookAt = Point(0, 0, 0);
 		int w = global.conf.getIntParam("picResX");
 		int h = global.conf.getIntParam("picResY");
-		buffer = FreeImage_Allocate(w, h, 32);
-		zBuffer = new float[][](w, h);
+		version(in_mem_buffer_with_z) {
+			buffer = FreeImage_Allocate(w, h, 32);
+			zBuffer = new float[][](w, h);
+		}
 		clearImageBufferToBackgroundColor;
 	}
 
@@ -71,8 +75,6 @@ class Scene {
 
 		//		static counter = 0;
 		//		writefln("Drawing %s", counter++);
-
-		bool drawToFeedbackBuffer = true;
 
 		static short lastTr = 0;
 
@@ -133,7 +135,7 @@ class Scene {
 
 		fillDisplayList();
 
-		if(drawToFeedbackBuffer) {
+		version(in_mem_buffer_with_z) {
 			glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR,
 					feedbackBuffer.ptr);
 			glRenderMode(GL_FEEDBACK);
@@ -142,7 +144,7 @@ class Scene {
 
 		int size = glRenderMode(GL_RENDER);
 
-		if(drawToFeedbackBuffer) {
+		version(in_mem_buffer_with_z) {
 			float
 					mx = cast(float) global.conf.getIntParam("picResX") / global.conf.getIntParam(
 							"resX");
@@ -181,16 +183,18 @@ class Scene {
 	void clearImageBufferToBackgroundColor() {
 		int w = global.conf.getIntParam("picResX");
 		int h = global.conf.getIntParam("picResY");
-		for(uint y = 0; y < h; y++) {
-			for(uint x = 0; x < w; x++) {
-				FreeImage_SetPixelColor(buffer, x, y,
-						getColor(global.bgColor[2], global.bgColor[1],
-								global.bgColor[0]));
+		version(in_mem_buffer_with_z) {
+			for(uint y = 0; y < h; y++) {
+				for(uint x = 0; x < w; x++) {
+					FreeImage_SetPixelColor(buffer, x, y, getColor(
+							global.bgColor[2], global.bgColor[1],
+							global.bgColor[0]));
+				}
 			}
+			foreach(ref line; zBuffer)
+				foreach(ref elem; line)
+					elem = 100;
 		}
-		foreach(ref line; zBuffer)
-			foreach(ref elem; line)
-				elem = 100;
 	}
 
 	public void increaseStack() {
@@ -425,51 +429,22 @@ class Scene {
 			writeln("Saving ...");
 		string definition = std.string.format("fractal%05d.ifs3d", n);
 		string picture = std.string.format("fractal%05d.jpeg", n);
-		string
-				pictureHighres = std.string.format("fractal%05d-highres.jpeg",
-						n);
-		string
-				pictureBicubic = std.string.format("fractal%05d-bicubic.jpeg",
-						n);
+		version(in_mem_buffer_with_z) {
+			string
+					pictureFromBuf = std.string.format("fractal%05d-buf.jpeg",
+							n);
+		}
 
 		global.o.writefln("Saving scene definition file...");
 		global.o.flush();
 		this.toStream(new std.stream.File(definition, FileMode.Out));
 
-		FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(buffer);
-		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
-				cast(char*) pictureBicubic, JPEG_QUALITYSUPERB);
-		FreeImage_Unload(nova24bit);
-
-		//		global.o.writef(std.string.format("Saving high res (%sx%s) image...",
-		//				global.conf.getIntParam("picResX"), global.conf.getIntParam(
-		//						"picResY")));
-		//		global.o.flush();
-		//		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, buffer,
-		//				cast(char*) pictureHighres, JPEG_QUALITYSUPERB);
-		//		global.o.writefln(" done");
-		//
-		//		FIBITMAP* pict32bit = FreeImage_ConvertTo32Bits(buffer);
-		//		FreeImage_AdjustGamma(pict32bit,
-		//				(global.conf.getIntParam("adjGamma") + 100) / 20);
-		//		FreeImage_AdjustBrightness(pict32bit, global.conf.getIntParam(
-		//				"adjBrightness"));
-		//		FreeImage_AdjustContrast(pict32bit, global.conf.getIntParam(
-		//				"adjContrast"));
-		//		FIBITMAP* nova = FreeImage_Rescale(pict32bit, global.conf.getIntParam(
-		//				"picSmallX"), global.conf.getIntParam("picSmallY"),
-		//				FREE_IMAGE_FILTER.FILTER_BICUBIC);
-		//		FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(nova);
-		//		global.o.writef(std.string.format("Saving resampled (%sx%s) image...",
-		//				global.conf.getIntParam("picSmallX"), global.conf.getIntParam(
-		//						"picSmallY")));
-		//		global.o.flush();
-		//		FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
-		//				cast(char*) pictureBicubic, JPEG_QUALITYSUPERB);
-		//		global.o.writefln(" done");
-		//		FreeImage_Unload(nova);
-		//		FreeImage_Unload(nova24bit);
-		//		FreeImage_Unload(pict32bit);
+		version(in_mem_buffer_with_z) {
+			FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(buffer);
+			FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit,
+					cast(char*) pictureFromBuf, JPEG_QUALITYSUPERB);
+			FreeImage_Unload(nova24bit);
+		}
 
 		global.o.writef("Saving screen capture image...");
 		global.o.flush();
@@ -515,21 +490,24 @@ class Scene {
 		[155, 000, 055]
 	, ];
 
-	const int POINTS_PER_ITERATION = 10_000;
+	const int POINTS_PER_ITERATION = 20_000;
 
-	FIBITMAP* buffer;
-	float[][] zBuffer;
+	version(in_mem_buffer_with_z) {
+		FIBITMAP* buffer;
+		float[][] zBuffer;
+		static float[] feedbackBuffer;
+	}
 
 	//positions and colorBuffer is used for display lists
 	static float[3][] positions;
 	static ubyte[3][] colorBuffer;
 	static short[] moveStack;
-	static float[] feedbackBuffer;
 
 	static this() {
 		positions.length = POINTS_PER_ITERATION;
 		colorBuffer.length = POINTS_PER_ITERATION;
-		feedbackBuffer.length = POINTS_PER_ITERATION * 8; //token x y z r g b a;
+		version(in_mem_buffer_with_z)
+			feedbackBuffer.length = POINTS_PER_ITERATION * 8; //token x y z r g b a;
 		moveStack.length = 2;
 	}
 }

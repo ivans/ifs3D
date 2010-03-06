@@ -1,7 +1,18 @@
+uniform vec3 CameraPosition;
+uniform float FadeOffDist;
+varying float Distance; 
+
 void main()
 { 
 	vec4 v = vec4(gl_Vertex);
-	//v.z = v.z + sin(v.x*v.x + v.y*v.y)/10.0;
+	float dx = v.x - CameraPosition.x;
+	float dy = v.y - CameraPosition.y;
+	float dz = v.z - CameraPosition.z;
+	Distance = clamp((dx*dx)+(dy*dy)+(dz*dz), 0.0, FadeOffDist);
+
+	vec4 c = vec4(gl_Color);
+	
+	gl_FrontColor = c * (1-Distance/FadeOffDist);
+	gl_FrontColor.a = 0.5;
 	gl_Position = gl_ModelViewProjectionMatrix * v;
-	gl_FrontColor = gl_Color;
 }

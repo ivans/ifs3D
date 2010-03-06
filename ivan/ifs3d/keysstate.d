@@ -17,6 +17,8 @@ class KeysState {
 		bool lAlt = false;
 		bool Left = false;
 		bool Right = false;
+		bool Up = false;
+		bool Down = false;
 		bool insert = false, del = false;
 
 		int pressed = 0;
@@ -47,6 +49,12 @@ class KeysState {
 				case GLFW_KEY_RIGHT:
 					this.Right = true;
 				break;
+				case GLFW_KEY_UP:
+					this.Up = true;
+				break;
+				case GLFW_KEY_DOWN:
+					this.Down = true;
+				break;
 				case GLFW_KEY_INSERT:
 					this.insert = true;
 				break;
@@ -72,6 +80,12 @@ class KeysState {
 				break;
 				case GLFW_KEY_RIGHT:
 					this.Right = false;
+				break;
+				case GLFW_KEY_UP:
+					this.Up = false;
+				break;
+				case GLFW_KEY_DOWN:
+					this.Down = false;
 				break;
 				case GLFW_KEY_INSERT:
 					this.insert = false;

@@ -13,6 +13,8 @@ private {
 	alias ivan.ifs3d.global global;
 
 	import ivan.ifs3d.callback;
+	import gl3 = ivan.ifs3d.gl3;
+	import gl;
 
 	alias ivan.ifs3d.callback callback;
 }
@@ -61,6 +63,10 @@ int main(string[] args) {
 		global.conf.setModelView();
 		//crtaj fraktal
 
+		gl3.glUniform3f(global.glslCameraPosition, scene.cameraPosition.x,
+				scene.cameraPosition.y, scene.cameraPosition.z);
+		gl3.glUniform1f(global.glslFadeOffDist, global.fadeOffDist);
+		
 		scene.draw();
 
 		if(conf.drawTransAndAxes == true) {
@@ -100,7 +106,8 @@ int main(string[] args) {
 	}
 
 	writefln("Terminating console thread...");
-	global.consoleThread.terminate(true);
+	if(global.consoleThread !is null)
+		global.consoleThread.terminate(true);
 	//Ovo više ne radi na D2
 	//global.o.writefln("Waiting for thread to terminate...");
 	//global.consoleThread.wait(1000);
@@ -162,6 +169,17 @@ void processMouseEvents() {
 		scene.selectNextTransformation;
 		glfwSleep(0.2);
 		conf.clrscr();
+	}
+
+	if(keys.Up == true) {
+		global.fadeOffDist -= 1;
+		writefln("FadeOffDist is now %s", global.fadeOffDist);
+		glfwSleep(0.1);
+	}
+	if(keys.Down == true) {
+		global.fadeOffDist += 1;
+		writefln("FadeOffDist is now %s", global.fadeOffDist);
+		glfwSleep(0.1);
 	}
 
 	void toZero(ref int val) {

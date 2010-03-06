@@ -367,3 +367,12 @@ extern(System):
 
 	GLvoid function(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
 			glGetProgramInfoLog;
+
+	GLint function(GLuint program, const char* name) glGetUniformLocation;
+
+	GLint function(GLint location, GLsizei count, GLfloat* v) glUniform3fv;
+
+	GLvoid function(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+			glUniform3f;
+
+	GLvoid function(GLint location, GLfloat v0) glUniform1f;
