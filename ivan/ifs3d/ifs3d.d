@@ -70,6 +70,8 @@ int main(string[] args) {
 		scene.draw();
 
 		if(conf.drawTransAndAxes == true) {
+			//nacrtaj očište kamere (bijela točka)
+			scene.drawOciste();
 			scene.drawTrans(bgColor[0], bgColor[1], bgColor[2]);
 			scene.drawCoordinateSystem();
 		}

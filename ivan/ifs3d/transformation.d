@@ -125,11 +125,11 @@ class Transformation {
 			int f1) {
 		if(f1 == 0)
 			return;
-		ifsfloat r = sqrt(x * x + y * y);
-		ifsfloat thetayx = atan(y / x);
+		//		ifsfloat r = sqrt(x * x + y * y);
+		//		ifsfloat thetayx = atan(y / x);
 		ifsfloat theta = atan(y / x);
-		ifsfloat thetazy = atan(z / y);
-		ifsfloat thetaxz = atan(x / z);
+		//		ifsfloat thetazy = atan(z / y);
+		//		ifsfloat thetaxz = atan(x / z);
 		switch(f1) {
 			case 0:
 			//linear
@@ -138,65 +138,82 @@ class Transformation {
 				//sinusoidal
 				x = sin(x);
 				y = sin(y);
+				z = sin(z);
 			break;
 			case 2:
 				//spherical
-				x = x / (r * r);
-				y = y / (r * r);
+				ifsfloat rr = x * x + y * y + z * z;
+				x = x / rr;
+				y = y / rr;
+				z = z / rr;
 			break;
 			case 3:
 				//swirl
+				ifsfloat r = sqrt(x * x + y * y);
 				x = r * cos(theta + r);
 				y = r * sin(theta + r);
+				z = r * cos(theta + r);
 			break;
 			case 4:
 				//horseshoe
+				ifsfloat r = sqrt(x * x + y * y);
 				x = r * cos(2 * theta);
 				y = r * sin(2 * theta);
+				z = -r * cos(2 * theta);
 			break;
 			case 5:
 				//polar
+				ifsfloat r = sqrt(x * x + y * y);
 				x = theta / PI;
 				y = r - 1;
+				z = theta / PI;
 			break;
 			case 6:
 				//handkerchief
+				ifsfloat r = sqrt(x * x + y * y);
 				x = r * sin(theta + r);
 				y = r * cos(theta - r);
 			break;
 			case 7:
 				//heart
+				ifsfloat r = sqrt(x * x + y * y);
 				x = r * sin(theta * r);
 				y = -r * cos(theta * r);
 			break;
 			case 8:
 				//disc
+				ifsfloat r = sqrt(x * x + y * y);
 				x = theta * sin(PI * r) / PI;
 				y = theta * cos(PI * r) / PI;
 			break;
 			case 9:
 				//spiral
+				ifsfloat r = sqrt(x * x + y * y);
 				x = (cos(theta) + sin(r)) / r;
 				y = (sin(theta) - cos(r)) / r;
 			break;
 			case 10:
 				//hyperbolic
+				ifsfloat r = sqrt(x * x + y * y);
 				x = sin(theta) / r;
 				y = cos(theta) * r;
 			break;
 			case 11:
 				//diamond
+				ifsfloat r = sqrt(x * x + y * y);
 				x = sin(theta) * cos(r);
 				y = cos(theta) * sin(r);
 			break;
 			case 12:
 				//ex
+				ifsfloat r = sqrt(x * x + y * y);
 				x = r * pow(sin(theta + r), 3);
 				y = r * pow(cos(theta - r), 3);
 			break;
 			case 13:
 				//julia
 				float omega;
+				ifsfloat r = sqrt(x * x + y * y);
 				int broj = std.random.uniform(0, 100);
 				if(broj < 50)
 					omega = 0;
@@ -207,6 +224,7 @@ class Transformation {
 			break;
 			case 14:
 				//fisheye
+				ifsfloat r = sqrt(x * x + y * y);
 				x = 2 * r * x / (r + 1);
 				y = 2 * r + y / (r + 1);
 			break;

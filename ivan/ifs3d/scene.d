@@ -78,9 +78,6 @@ class Scene {
 
 		static short lastTr = 0;
 
-		//nacrtaj očište kamere (bijela točka)
-		drawOciste();
-
 		ubyte getColor(int index) {
 			int suma = 0;
 			for(int i = moveStack.length - 1; i >= 0; i--) {
@@ -411,6 +408,7 @@ class Scene {
 			transformations[selectedTrans].Wz = transformations[selectedTrans].Wz + amount;
 		}
 		updateSomeOfTransformationMatrix();
+		this.recalculateVolume();
 	}
 
 	void rotateSelected(int sign) {
@@ -425,6 +423,8 @@ class Scene {
 			f += Transformation.numberOfFunc;
 		else
 			f %= Transformation.numberOfFunc;
+		debug
+			writefln("Selected function is now %s", f);
 		transformations[selectedTrans].func = f;
 	}
 
