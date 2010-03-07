@@ -66,7 +66,7 @@ int main(string[] args) {
 		gl3.glUniform3f(global.glslCameraPosition, scene.cameraPosition.x,
 				scene.cameraPosition.y, scene.cameraPosition.z);
 		gl3.glUniform1f(global.glslFadeOffDist, global.fadeOffDist);
-		
+
 		scene.draw();
 
 		if(conf.drawTransAndAxes == true) {
@@ -321,6 +321,36 @@ void setCallbackDelegates() {
 				break;
 				case '-':
 					scene.decreaseStack();
+				break;
+				case 'u':
+					scene.resizeSelected(1, 0.1);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
+				break;
+				case 'j':
+					scene.resizeSelected(1, -0.1);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
+				break;
+				case 'i':
+					scene.resizeSelected(2, 0.1);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
+				break;
+				case 'k':
+					scene.resizeSelected(2, -0.1);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
+				break;
+				case 'o':
+					scene.resizeSelected(3, 0.1);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
+				break;
+				case 'l':
+					scene.resizeSelected(3, -0.1);
+					conf.clrscr();
+					global.scene.clearImageBufferToBackgroundColor();
 				break;
 				default:
 				break;

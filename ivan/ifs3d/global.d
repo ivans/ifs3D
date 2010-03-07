@@ -26,7 +26,7 @@ package float[] bgColor;
 
 package int glslCameraPosition;
 package int glslFadeOffDist;
-package float fadeOffDist = 50;
+package float fadeOffDist = 100;
 
 alias std.cstream.dout o;
 

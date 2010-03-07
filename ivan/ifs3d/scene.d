@@ -402,11 +402,20 @@ class Scene {
 		}
 	}
 
+	void resizeSelected(short direction, ifsfloat amount) {
+		if(direction == 1) {
+			transformations[selectedTrans].Wx = transformations[selectedTrans].Wx + amount;
+		} else if(direction == 2) {
+			transformations[selectedTrans].Wy = transformations[selectedTrans].Wy + amount;
+		} else if(direction == 3) {
+			transformations[selectedTrans].Wz = transformations[selectedTrans].Wz + amount;
+		}
+		updateSomeOfTransformationMatrix();
+	}
+
 	void rotateSelected(int sign) {
 		transformations[selectedTrans].Ra = sign * PI / 32 + transformations[selectedTrans].Ra;
 		updateSomeOfTransformationMatrix();
-		//TODO provjeriti ali mislim da mi ovo ne treba jer se ne mijenja Wx, Wy ili Wz
-		//		this.recalculateVolume();
 	}
 
 	void changeFunctionOfSelected(int direction) {
