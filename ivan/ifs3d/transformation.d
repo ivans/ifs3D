@@ -290,7 +290,7 @@ class Transformation {
 			[1, 0, 0, -from.X],
 			[0, 1, 0, -from.Y],
 			[0, 0, 1, -from.Z],
-			[0, 0, 0, 1]
+			[0, 0, 0, cast(real)1]
 		];
 		ifsfloat[4][4] M2;
 		MakeRotationMatrix(-from.Ra, from.Rx, from.Ry, from.Rz, M2);
@@ -298,7 +298,7 @@ class Transformation {
 			[to.Wx / from.Wx, 0, 0, 0],
 			[0, to.Wy / from.Wy, 0, 0],
 			[0, 0, to.Wz / from.Wz, 0],
-			[0, 0, 0, 1]
+			[0, 0, 0, cast(real)1]
 		];
 		ifsfloat[4][4] M4;
 		MakeRotationMatrix(to.Ra, to.Rx, to.Ry, to.Rz, M4);
@@ -306,7 +306,7 @@ class Transformation {
 			[1, 0, 0, to.X],
 			[0, 1, 0, to.Y],
 			[0, 0, 1, to.Z],
-			[0, 0, 0, 1]
+			[0, 0, 0, cast(real)1]
 		];
 
 		ifsfloat[4][4] temp;
