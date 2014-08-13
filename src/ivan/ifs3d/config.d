@@ -9,7 +9,7 @@ private {
 	import ivan.ifs3d.callback;
 	import ivan.ifs3d.global;
 
-	import gl, gl3, glu;
+	import gl, gl3 = ivan.ifs3d.gl3, glu;
 	import deimos.glfw.glfw3;
 	import freeimage;
 }
@@ -238,6 +238,7 @@ class Config {
 			glfwTerminate();
 			return;
 		}
+		glfwMakeContextCurrent (global.glfwWindow);
 		glfwSetInputMode( global.glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
 		glfwSetInputMode( global.glfwWindow, GLFW_STICKY_KEYS, GL_TRUE );
 		/*glfwEnable(GLFW_MOUSE_CURSOR);

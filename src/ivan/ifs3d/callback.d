@@ -11,32 +11,28 @@ void delegate(int button, int action) mouseButton;
 void delegate(int key, int action) keyCallback;
 void delegate(int character, int state) characterCallback;
 
-extern(Windows)
+extern(System):
+
 	void windowResizeFunc(int w, int h) {
 		windowResize(w, h);
 	}
 
-extern(Windows)
 	void mouseWheelFunc(int pos) {
 		mouseWheel(pos);
 	}
 
-extern(Windows)
 	void mousePosFunc(int x, int y) {
 		mousePos(x, y);
 	}
 
-extern(Windows)
 	void mouseButtonFunc(int button, int action) {
 		mouseButton(button, action);
 	}
 
-extern(Windows)
 	void keyCallbackFunc(int key, int action) {
 		keyCallback(key, action);
 	}
 
-extern(Windows)
 	void characterCallbackFunc(int character, int state) {
 		characterCallback(character, state);
 	}
