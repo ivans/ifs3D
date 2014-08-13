@@ -10,6 +10,7 @@ private {
 	import ivan.ifs3d.scene;
 	import ivan.ifs3d.consolethread;
 	import freeimage;
+	import deimos.glfw.glfw3;// import glfw;
 }
 
 package Config conf;
@@ -19,6 +20,7 @@ package Scene scene;
 package KeysState keys;
 package int clearscreen = 2;
 package ConsoleThread consoleThread;
+package GLFWwindow* glfwWindow;
 
 package float[3] bgColorBlack = [0, 0, 0];
 package float[3] bgColorWhite = [1, 1, 1];

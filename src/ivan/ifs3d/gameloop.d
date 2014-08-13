@@ -1,7 +1,7 @@
 module ivan.ifs3d.gameloop;
 
 private {
-	import glfw;
+	import deimos.glfw.glfw3;
 	import std.string, std.stdio;
 	import ivan.ifs3d.scene;
 	import ivan.ifs3d.global;
@@ -29,7 +29,7 @@ class GameLoop {
 			frames = 0;
 
 			string titlestr = std.string.format("3D IFS (%sfps)\0", fps);
-			glfw.glfwSetWindowTitle(cast(char*) titlestr.ptr);
+			glfwSetWindowTitle( global.glfwWindow, cast(char*)titlestr.ptr );
 		}
 		frames++;
 	}
@@ -37,10 +37,11 @@ class GameLoop {
 	void start() {
 		while(running) {
 			calculateFps();
-			glfwGetMousePos(&global.mouse.X, &global.mouse.Y);
+			glfwGetCursorPos( global.glfwWindow, &global.mouse.X, &global.mouse.Y );
 			draw();
-			running = !glfwGetKey(GLFW_KEY_ESC) && glfwGetWindowParam(
-					GLFW_OPENED);
+			auto notKeyEsc = !glfwGetKey( global.glfwWindow, GLFW_KEY_ESCAPE );
+			auto visible = glfwGetWindowAttrib( global.glfwWindow, GLFW_VISIBLE ) != 0;
+			running = notKeyEsc;// && visible;
 		}
 	}
 }

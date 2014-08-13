@@ -9,12 +9,11 @@ private {
 	import ivan.ifs3d.callback;
 	import ivan.ifs3d.global;
 
-	alias ivan.ifs3d.global global;
-
-	import gl3 = ivan.ifs3d.gl3;
-	import glfw;
+	import gl, gl3, glu;
+	import deimos.glfw.glfw3;
 	import freeimage;
 }
+alias ivan.ifs3d.global global;
 
 class Config {
 	this(string fileName) {
@@ -60,7 +59,7 @@ class Config {
 		char[] value;
 		std.stream.File f = new std.stream.File(fileName, FileMode.In);
 		while(f.readf(&key, &value) != 0) {
-			intParams[key.dup] = std.conv.to!(int)(value);
+			intParams[key.idup] = std.conv.to!(int)(value);
 		}
 		printParams(global.o);
 		f.close();
@@ -83,8 +82,8 @@ class Config {
 		FreeImage_Initialise();
 		auto freeImgVersion = FreeImage_GetVersion();
 		auto freeImgCopyright = FreeImage_GetCopyrightMessage();
-		uint len1 = std.c.string.strlen(freeImgVersion);
-		uint len2 = std.c.string.strlen(freeImgCopyright);
+		ulong len1 = std.c.string.strlen(freeImgVersion);
+		ulong len2 = std.c.string.strlen(freeImgCopyright);
 
 		writefln("FreeImage version: %s\nFreeImage copyright: %s",
 				freeImgVersion[0 .. len1], freeImgCopyright[0 .. len2]);
@@ -98,7 +97,7 @@ class Config {
 		int v1, v2, v3;
 		glfwGetVersion(&v1, &v2, &v3);
 		writefln("Using glfw version; %s.%s.%s", v1, v2, v3);
-		glfwGetDesktopMode(&desktopMode);
+		glfwGetVideoMode(glfwGetPrimaryMonitor());
 	}
 
 	private int testExtension(string name) {
@@ -128,11 +127,10 @@ class Config {
 	}
 
 	void initGlExtensionMethods() {
-		if(testExtension("GL_ARB_vertex_shader") == 1 && testExtension(
-				"GL_ARB_fragment_shader") == 1) {
-			debug
-				writefln(
-						"Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+		auto testVertexShader = testExtension("GL_ARB_vertex_shader");
+		auto testFragmentShader = testExtension("GL_ARB_fragment_shader");
+		if(testVertexShader == 1 && testFragmentShader == 1) {
+			debug writefln("Imamo :) GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 
 			mixin(gl3.getMethodPointer("glCreateShader"));
 			mixin(gl3.getMethodPointer("glShaderSource"));
@@ -192,26 +190,21 @@ class Config {
 
 			writeln("After shader source i compile");
 		} else {
-			debug
-				writefln(
-						"Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
+			debug writefln("Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 		}
 
 	}
 
 	void registerCallbacks() {
-		//		debug
-		//			global.o.writefln("register callbacks...");
-		glfwSetWindowSizeCallback(cast(GLFWwindowsizefun) &windowResizeFunc);
+		debug global.o.writefln("register callbacks... for window = %s", global.glfwWindow);
+		glfwSetWindowSizeCallback(global.glfwWindow, cast(GLFWwindowsizefun)&windowResizeFunc);
+		glfwSetKeyCallback(global.glfwWindow, cast(GLFWkeyfun)&keyCallbackFunc);
+		glfwSetCharCallback(global.glfwWindow, cast(GLFWcharfun)&characterCallbackFunc);
+		//glfwSetMouseWheel(0);// TODO vidjeti da li ovo trebamo
 
-		glfwSetKeyCallback(cast(GLFWkeyfun) &keyCallbackFunc);
-		glfwSetCharCallback(cast(GLFWcharfun) &characterCallbackFunc);
-
-		glfwSetMouseWheel(0);
-
-		glfwSetMousePosCallback(cast(GLFWmouseposfun) &mousePosFunc);
-		glfwSetMouseButtonCallback(cast(GLFWmousebuttonfun) &mouseButtonFunc);
-		glfwSetMouseWheelCallback(cast(GLFWmousewheelfun) &mouseWheelFunc);
+		glfwSetCursorPosCallback(global.glfwWindow, cast(GLFWcursorposfun)&mousePosFunc);
+		glfwSetMouseButtonCallback(global.glfwWindow, cast(GLFWmousebuttonfun)&mouseButtonFunc);
+		glfwSetScrollCallback(global.glfwWindow, cast(GLFWscrollfun)&mouseWheelFunc);
 	}
 
 	void setPerspective() {
@@ -240,15 +233,16 @@ class Config {
 	}
 
 	void showWindow() {
-		if(!glfwOpenWindow(getIntParam("resX"), getIntParam("resY"), 0, 0, 0,
-				0, getIntParam("depthBits"), 0, currentWindowType)) {
+		global.glfwWindow = glfwCreateWindow( getIntParam("resX"), getIntParam("resY"), "ifs3dnew", null, null );
+		if( !global.glfwWindow ) {
 			glfwTerminate();
 			return;
 		}
-		glfwEnable(GLFW_MOUSE_CURSOR);
-
+		glfwSetInputMode( global.glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL );
+		glfwSetInputMode( global.glfwWindow, GLFW_STICKY_KEYS, GL_TRUE );
+		/*glfwEnable(GLFW_MOUSE_CURSOR);
 		glfwEnable(GLFW_STICKY_KEYS);
-		glfwEnable(GLFW_KEY_REPEAT);
+		glfwEnable(GLFW_KEY_REPEAT);*/
 		glfwSwapInterval(0);
 
 		glClearColor(bgColor[0], bgColor[1], bgColor[2], 0.0f);
@@ -261,8 +255,8 @@ class Config {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
-		//glEnable(GL_POINT_SMOOTH);
 		glDrawBuffer(GL_FRONT_AND_BACK);
+		//glEnable(GL_POINT_SMOOTH);
 	}
 
 	void terminateGlfw() {
@@ -298,5 +292,4 @@ class Config {
 
 	bool drawTransAndAxes = true;
 	GLFWvidmode desktopMode;
-	int currentWindowType = GLFW_WINDOW;
 }

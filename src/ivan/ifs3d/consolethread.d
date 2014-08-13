@@ -10,7 +10,11 @@ import std.cstream;
 
 public class ConsoleThread: Thread {
 
-	public int run() {
+	this() {
+		super(&run);
+	}
+
+	private void run() {
 		writefln("Starting console thread...");
 		while(term != true) {
 			char[] line = din.readLine();
@@ -26,7 +30,6 @@ public class ConsoleThread: Thread {
 			}
 			global.conf.printParams(global.o);
 		}
-		return 1;
 	}
 
 	//TODO D2 problem sa shared

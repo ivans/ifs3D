@@ -3,7 +3,8 @@ module ivan.ifs3d.ifs3d;
 private {
 	import std.stream, std.cstream;
 	import std.stdio, std.string;
-	import glfw, freeimage;
+	import core.thread;
+	import deimos.glfw.glfw3, freeimage;
 	import ivan.ifs3d.config;
 	import ivan.ifs3d.scene;
 	import ivan.ifs3d.transformation;
@@ -13,7 +14,6 @@ private {
 	alias ivan.ifs3d.global global;
 
 	import ivan.ifs3d.callback;
-	import gl3 = ivan.ifs3d.gl3;
 	import gl;
 
 	alias ivan.ifs3d.callback callback;
@@ -21,10 +21,10 @@ private {
 
 import std.c.process;
 
-pragma(lib, "glfwdll.lib");
-pragma(lib, "opengl32.lib");
-pragma(lib, "glu32.lib");
-pragma(lib, "freeimage.lib");
+//pragma(lib, "glfwdll.lib");
+//pragma(lib, "opengl32.lib");
+//pragma(lib, "glu32.lib");
+//pragma(lib, "freeimage.lib");
 
 //version = log_mouse_events;
 
@@ -76,7 +76,7 @@ int main(string[] args) {
 			scene.drawCoordinateSystem();
 		}
 
-		glfwSwapBuffers();
+		glfwSwapBuffers(global.glfwWindow);
 		//		global.o.flush();
 
 		processMouseEvents();
@@ -150,38 +150,38 @@ void processMouseEvents() {
 
 	if(keys.insert == true) {
 		scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
-		scene.selectedTrans = scene.transformations.length - 1;
+		scene.selectedTrans = cast(int)scene.transformations.length - 1;
 		scene.resetPos();
 		scene.updateTransformationMatrix();
-		glfwSleep(0.2);
+		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
 	if(keys.del == true) {
 		scene.deleteTransformation();
-		glfwSleep(0.2);
+		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
 
 	if(keys.Left == true) {
 		scene.selectPrevTransformation;
-		glfwSleep(0.2);
+		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
 	if(keys.Right == true) {
 		scene.selectNextTransformation;
-		glfwSleep(0.2);
+		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
 
 	if(keys.Up == true) {
 		global.fadeOffDist -= 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
-		glfwSleep(0.1);
+		Thread.sleep(dur!("msecs")(100));
 	}
 	if(keys.Down == true) {
 		global.fadeOffDist += 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
-		glfwSleep(0.1);
+		Thread.sleep(dur!("msecs")(100));
 	}
 
 	void toZero(ref int val) {
@@ -218,8 +218,8 @@ void setCallbackDelegates() {
 	};
 
 	callback.mousePos = (int x, int y) {
-		mouse.XDelta = x - mouse.X;
-		mouse.YDelta = y - mouse.Y;
+		mouse.XDelta = cast(int)(x - mouse.X);
+		mouse.YDelta = cast(int)(y - mouse.Y);
 		debug
 			version(log_mouse_events)
 				writefln("Mouse: pos(%s, %s), delta(%s, %s)", x, y,

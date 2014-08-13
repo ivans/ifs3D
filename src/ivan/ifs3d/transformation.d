@@ -4,8 +4,7 @@ private {
 	import std.math;
 	import std.stream;
 	import std.stdio;
-	import glfw;
-
+	import deimos.glfw.glfw3, gl;
 	import ivan.ifs3d.types;
 }
 

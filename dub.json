@@ -1,0 +1,11 @@
+{
+	"name": "ifs3D",
+	"targetType": "executable",
+	"description": "TODO",
+	"authors": ["Ivan Senji"],
+	"homepage": "TODO",
+	"importPaths": ["imports"],
+	"libs": ["freeimage", "glfw", "GL", "GLU"],
+	"buildOptions": ["debugMode", "debugInfo"],
+	"dflags-dmd": ["-Jsrc/ivan/ifs3d/shaders"]
+}

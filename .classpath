@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<classpath>
-	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="descent.USER_LIBRARY/druntime"/>
-	<classpathentry kind="con" path="descent.USER_LIBRARY/phobos"/>
-	<classpathentry kind="con" path="descent.USER_LIBRARY/glfw &amp; opengl"/>
-	<classpathentry kind="output" path=""/>
-</classpath>

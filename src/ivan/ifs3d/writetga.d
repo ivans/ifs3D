@@ -2,7 +2,7 @@
 
 import std.c.stdio, std.stdio;
 import std.c.stdlib;
-import glfw;
+import deimos.glfw.glfw3, gl;
 import freeimage;
 
 struct TGAHEADER {

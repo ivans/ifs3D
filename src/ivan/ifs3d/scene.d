@@ -1,7 +1,7 @@
 ﻿module ivan.ifs3d.scene;
 
 private {
-	import glfw, freeimage;
+	import deimos.glfw.glfw3, freeimage, gl;
 	import std.math;
 	import std.random;
 	import ivan.ifs3d.point;
@@ -71,70 +71,65 @@ class Scene {
 		glEnd();
 	}
 
-	void draw() {
+	short lastTr = 0;
 
-		//		static counter = 0;
-		//		writefln("Drawing %s", counter++);
+	void fillDisplayList() {
+		for(int i = 0; i < POINTS_PER_ITERATION; i++) {
+			colorBuffer[i][0] = getColor(0);
+			colorBuffer[i][1] = getColor(1);
+			colorBuffer[i][2] = getColor(2);
 
-		static short lastTr = 0;
+			positions[i][0] = x;
+			positions[i][1] = y;
+			positions[i][2] = z;
 
-		ubyte getColor(int index) {
-			int suma = 0;
-			for(int i = moveStack.length - 1; i >= 0; i--) {
-				suma += cast(int) (colors[(moveStack[i]) % colors.length][index]);
-			}
-			return cast(ubyte) (suma / moveStack.length);
-		}
+			synchronized(this)
+				transformations[lastTr = nlRand()].transformPoint(x, y, z);
 
-		short nlRand() {
-			//TODO proučiti da li je ovaj rand ok!
-			ifsfloat
-					randNum = (std.random.uniform(0, 10000) % (transformationVolumeSum));
-			ifsfloat counter = 0;
-			for(long index = 1; index < transformations.length; index++) {
-				counter += abs(transformations[cast(int) index].area);
-				if(randNum < counter)
-					return cast(short) index;
-			}
-			return 0;
-		}
-
-		void fillDisplayList() {
-			for(int i = 0; i < POINTS_PER_ITERATION; i++) {
-				colorBuffer[i][0] = getColor(0);
-				colorBuffer[i][1] = getColor(1);
-				colorBuffer[i][2] = getColor(2);
-
-				positions[i][0] = x;
-				positions[i][1] = y;
-				positions[i][2] = z;
-
-				synchronized(this)
-					transformations[lastTr = nlRand()].transformPoint(x, y, z);
-
-				synchronized(this) {
-					for(int k = 1; k < moveStack.length; k++) {
-						moveStack[k - 1] = moveStack[k];
-					}
-					moveStack[moveStack.length - 1] = lastTr;
+			synchronized(this) {
+				for(int k = 1; k < moveStack.length; k++) {
+					moveStack[k - 1] = moveStack[k];
 				}
+				moveStack[moveStack.length - 1] = lastTr;
 			}
 		}
+	}
 
-		void drawDisplayList() {
-			glPointSize(1);
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glEnableClientState(GL_COLOR_ARRAY);
-			glVertexPointer(3, GL_FLOAT, 0, positions.ptr);
-			glColorPointer(3, GL_UNSIGNED_BYTE, 0, colorBuffer.ptr);
-			glDrawArrays(GL_POINTS, 0, positions.length / 3);
+	ubyte getColor(int index) {
+		int suma = 0;
+		for(int i=cast(int)(moveStack.length-1); i>=0; i--) {
+			suma += cast(int) (colors[(moveStack[i]) % colors.length][index]);
 		}
+		return cast(ubyte) (suma / moveStack.length);
+	}
+
+	short nlRand() {
+		//TODO proučiti da li je ovaj rand ok!
+		ifsfloat randNum = (std.random.uniform(0, 10000) % (transformationVolumeSum));
+		ifsfloat counter = 0;
+		for(long index = 1; index < transformations.length; index++) {
+			counter += abs(transformations[cast(int) index].area);
+			if(randNum < counter)
+				return cast(short) index;
+		}
+		return 0;
+	}
+
+	void drawDisplayList() {
+		glPointSize(1);
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_COLOR_ARRAY);
+		glVertexPointer(3, GL_FLOAT, 0, positions.ptr);
+		glColorPointer(3, GL_UNSIGNED_BYTE, 0, colorBuffer.ptr);
+		glDrawArrays(cast(uint)GL_POINTS, 0, cast(int)(positions.length/3));
+	}
+
+	void draw() {
 
 		fillDisplayList();
 
 		version(in_mem_buffer_with_z) {
-			glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR,
-					feedbackBuffer.ptr);
+			glFeedbackBuffer(feedbackBuffer.length, GL_3D_COLOR, feedbackBuffer.ptr);
 			glRenderMode(GL_FEEDBACK);
 			drawDisplayList();
 		}
@@ -200,7 +195,7 @@ class Scene {
 	}
 
 	public void decreaseStack() {
-		int size = moveStack.length - 1;
+		int size = cast(int)(moveStack.length - 1);
 		if(size > 0) {
 			synchronized(this)
 				moveStack.length = size;
@@ -361,7 +356,7 @@ class Scene {
 	}
 
 	void selectNextTransformation() {
-		selectedTrans = (selectedTrans + 1) % transformations.length;
+		selectedTrans = cast(int)((selectedTrans + 1) % transformations.length);
 	}
 
 	void selectPrevTransformation() {
@@ -488,18 +483,18 @@ class Scene {
 
 	private ubyte[][] colors = [
 		[125, 125, 125],
-		[255, 000, 000],
-		[000, 255, 000],
-		[000, 000, 255],
-		[255, 255, 000],
-		[000, 255, 255],
-		[255, 000, 255],
+		[255,   0,   0],
+		[  0, 255,   0],
+		[  0,   0, 255],
+		[255, 255,   0],
+		[  0, 255, 255],
+		[255,   0, 255],
 		[255, 255, 255],
 		[100, 155, 255],
-		[155, 000, 055]
+		[155,   0,  55]
 	, ];
 
-	const int POINTS_PER_ITERATION = 20_000;
+	static int POINTS_PER_ITERATION = 20_000;
 
 	version(in_mem_buffer_with_z) {
 		FIBITMAP* buffer;

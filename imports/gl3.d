@@ -1,5 +1,6 @@
-module ivan.ifs3d.gl3;
+module gl3;
 
+import gl;
 //http://www.opengl.org/registry/api/gl3.h
 
 string getMethodPointer(string name) {
@@ -12,6 +13,10 @@ string getMethodPointer(string name) {
 version = GL_VERSION_2_0;
 
 extern(System):
+
+alias char GLchar;
+
+/+
 
 	alias uint GLenum;
 	alias ubyte GLboolean;
@@ -28,7 +33,7 @@ extern(System):
 	alias double GLdouble;
 	alias double GLclampd;
 	alias void GLvoid;
-	alias char GLchar;
+
 
 	/* AttribMask */
 	const uint GL_DEPTH_BUFFER_BIT = 0x00000100;
@@ -255,7 +260,7 @@ extern(System):
 	const uint GL_RGB10_A2 = 0x8059;
 	const uint GL_RGBA12 = 0x805A;
 	const uint GL_RGBA16 = 0x805B;
-
++/
 	version(GL_VERSION_2_0) {
 		const uint GL_BLEND_EQUATION_RGB = 0x8009;
 		const uint GL_VERTEX_ATTRIB_ARRAY_ENABLED = 0x8622;
@@ -341,38 +346,34 @@ extern(System):
 
 	alias uint GLhandleARB;
 
-	GLuint function(GLenum shaderType) glCreateShader;
+	__gshared GLuint function(GLenum shaderType) glCreateShader;
 
-	GLvoid function(GLuint shader, int numOfStrings, const char** strings, int* lenOfStrings)
-			glShaderSource;
+	__gshared GLvoid function(GLuint shader, int numOfStrings, const char** strings, int* lenOfStrings)	glShaderSource;
 
-	GLvoid function(GLuint shader) glCompileShader;
+	__gshared GLvoid function(GLuint shader) glCompileShader;
 
-	GLuint function() glCreateProgram;
+	__gshared GLuint function() glCreateProgram;
 
-	GLvoid function(GLuint program, GLuint shader) glAttachShader;
+	__gshared GLvoid function(GLuint program, GLuint shader) glAttachShader;
 
-	GLvoid function(GLuint program) glLinkProgram;
+	__gshared GLvoid function(GLuint program) glLinkProgram;
 
-	GLvoid function(GLuint prog) glUseProgram;
+	__gshared GLvoid function(GLuint prog) glUseProgram;
 
-	GLboolean function(GLuint shader) glIsShader;
+	__gshared GLboolean function(GLuint shader) glIsShader;
 
-	GLvoid function(GLuint shader, GLenum pname, GLint* params) glGetShaderiv;
+	__gshared GLvoid function(GLuint shader, GLenum pname, GLint* params) glGetShaderiv;
 
-	GLvoid function(GLuint program, GLenum pname, GLint* params) glGetProgramiv;
+	__gshared GLvoid function(GLuint program, GLenum pname, GLint* params) glGetProgramiv;
 
-	GLvoid function(GLuint shader, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
-			glGetShaderInfoLog;
+	__gshared GLvoid function(GLuint shader, GLsizei maxLength, GLsizei* length, GLchar* infoLog) glGetShaderInfoLog;
 
-	GLvoid function(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog)
-			glGetProgramInfoLog;
+	__gshared GLvoid function(GLuint program, GLsizei maxLength, GLsizei* length, GLchar* infoLog) glGetProgramInfoLog;
 
-	GLint function(GLuint program, const char* name) glGetUniformLocation;
+	__gshared GLint function(GLuint program, const char* name) glGetUniformLocation;
 
-	GLint function(GLint location, GLsizei count, GLfloat* v) glUniform3fv;
+	__gshared GLint function(GLint location, GLsizei count, GLfloat* v) glUniform3fv;
 
-	GLvoid function(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
-			glUniform3f;
+	__gshared GLvoid function(GLint location, GLfloat v0, GLfloat v1, GLfloat v2) glUniform3f;
 
-	GLvoid function(GLint location, GLfloat v0) glUniform1f;
+	__gshared GLvoid function(GLint location, GLfloat v0) glUniform1f;
