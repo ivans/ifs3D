@@ -22,8 +22,7 @@ public class ConsoleThread: Thread {
 			char[][] parts = line.split();
 			if(parts.length == 2) {
 				try {
-					global.conf.setIntParam(cast(string) parts[0],
-							std.conv.to!(int)(parts[1]));
+					global.conf.setIntParam(cast(string) parts[0], std.conv.to!(int)(parts[1]));
 				} catch(Exception e) {
 					writefln(e.msg);
 				}

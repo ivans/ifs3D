@@ -2,37 +2,45 @@ module ivan.ifs3d.callback;
 
 private {
 	import ivan.ifs3d.mousestate;
+	import deimos.glfw.glfw3;
+	import std.stdio;
 }
 
 void delegate(int w, int h) windowResize;
-void delegate(int pos) mouseWheel;
-void delegate(int x, int y) mousePos;
-void delegate(int button, int action) mouseButton;
-void delegate(int key, int action) keyCallback;
-void delegate(int character, int state) characterCallback;
+void delegate(double xscroll, double yscroll) mouseWheel;
+void delegate(double x, double y) mousePos;
+void delegate(int button, int action, int mods) mouseButton;
+void delegate(int key, int scancode, int action, int mods) keyCallback;
+void delegate(uint character) characterCallback;
 
 extern(System):
 
-	void windowResizeFunc(int w, int h) {
+	void windowResizeFunc(GLFWwindow* glfwWindow, int w, int h) {
+		debug writefln("windowResizeFunc");
 		windowResize(w, h);
 	}
 
-	void mouseWheelFunc(int pos) {
-		mouseWheel(pos);
+	void mouseWheelFunc(GLFWwindow* glfwWindow, double xscroll, double yscroll) {
+		debug writefln("mouseWheelFunc");
+		mouseWheel(xscroll, yscroll);
 	}
 
-	void mousePosFunc(int x, int y) {
+	void mousePosFunc(GLFWwindow* glfwWindow, double x, double y) {
+		debug writefln("mousePosFunc");
 		mousePos(x, y);
 	}
 
-	void mouseButtonFunc(int button, int action) {
-		mouseButton(button, action);
+	void mouseButtonFunc(GLFWwindow* glfwWindow, int button, int action, int mods) {
+		debug writefln("mouseButtonFunc");
+		mouseButton(button, action, mods);
 	}
 
-	void keyCallbackFunc(int key, int action) {
-		keyCallback(key, action);
+	void keyCallbackFunc(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
+		debug writefln("keyCallbackFunc");
+		keyCallback(key, scancode, action, mods);
 	}
 
-	void characterCallbackFunc(int character, int state) {
-		characterCallback(character, state);
+	void characterCallbackFunc(GLFWwindow* glfwWindow, uint character) {
+		debug writefln("characterCallbackFunc");
+		characterCallback(character);
 	}

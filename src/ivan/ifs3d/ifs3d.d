@@ -83,21 +83,18 @@ int main(string[] args) {
 	};
 
 	global.conf.showWindow();
-	global.conf.registerCallbacks();
 	global.conf.initGlExtensionMethods();
+	global.conf.registerCallbacks();
 
 	auto glRenderer = cast(char*) glGetString(GL_RENDERER);
 	auto glVersion = cast(char*) glGetString(GL_VERSION);
 	auto glVendor = cast(char*) glGetString(GL_VENDOR);
 	auto glExtensions = cast(char*) glGetString(GL_EXTENSIONS);
 
-	writefln("GL_RENDERER   = %s", glRenderer[0 .. std.c.string.strlen(
-			glRenderer)]);
-	writefln("GL_VERSION    = %s",
-			glVersion[0 .. std.c.string.strlen(glVersion)]);
+	writefln("GL_RENDERER   = %s", glRenderer[0 .. std.c.string.strlen(glRenderer)]);
+	writefln("GL_VERSION    = %s", glVersion[0 .. std.c.string.strlen(glVersion)]);
 	writefln("GL_VENDOR     = %s", glVendor[0 .. std.c.string.strlen(glVendor)]);
-	writefln("GL_EXTENSIONS = %s", glExtensions[0 .. std.c.string.strlen(
-			glExtensions)]);
+	writefln("GL_EXTENSIONS = %s", glExtensions[0 .. std.c.string.strlen(glExtensions)]);
 
 	try {
 		writefln("Starting main loop...");
@@ -197,41 +194,32 @@ void processMouseEvents() {
 }
 
 void setCallbackDelegates() {
-	debug
-		writefln("void setCallbackDelegates()");
+	debug writefln("void setCallbackDelegates()");
 
 	callback.windowResize = (int w, int h) {
-		debug
-			writefln("Resizing to: (", w, ",", h, ")");
+		debug writefln("Resizing to: (", w, ",", h, ")");
 		global.conf.setIntParam("resX", w);
 		global.conf.setIntParam("resY", h);
 		glViewport(0, 0, w, h);
 		conf.clrscr();
 	};
 
-	callback.mouseWheel = (int pos) {
-		debug
-			version(log_mouse_events)
-				writefln("Mouse: scroll: %s", pos);
-		mouse.WheelDelta = pos - mouse.WheelPos;
-		mouse.WheelPos = pos;
+	callback.mouseWheel = (double xscroll, double yscroll) {
+		debug version(log_mouse_events) writefln("Mouse: scroll: %s", yscroll);
+		mouse.WheelDelta = cast(int)(yscroll - mouse.WheelPos);
+		mouse.WheelPos = cast(int)yscroll;
 	};
 
-	callback.mousePos = (int x, int y) {
+	callback.mousePos = (double x, double y) {
 		mouse.XDelta = cast(int)(x - mouse.X);
 		mouse.YDelta = cast(int)(y - mouse.Y);
-		debug
-			version(log_mouse_events)
-				writefln("Mouse: pos(%s, %s), delta(%s, %s)", x, y,
-						mouse.XDelta, mouse.YDelta);
+		debug version(log_mouse_events) writefln("Mouse: pos(%s, %s), delta(%s, %s)", x, y, mouse.XDelta, mouse.YDelta);
 		mouse.X = x;
 		mouse.Y = y;
 	};
 
-	callback.mouseButton = (int button, int action) {
-		debug
-			version(log_mouse_events)
-				writefln("Mouse: button: %s, action: %s", button, action);
+	callback.mouseButton = (int button, int action, int mods) {
+		debug version(log_mouse_events) writefln("Mouse: button: %s, action: %s", button, action);
 
 		mouse.LeftOld = mouse.Left;
 		mouse.RightOld = mouse.Right;
@@ -254,112 +242,105 @@ void setCallbackDelegates() {
 		}
 	};
 
-	callback.keyCallback = (int key, int action) {
-		debug
-			version(log_mouse_events)
-				writefln("Key: ", key, ", ", action);
+	callback.keyCallback = (int key, int scancode, int action, int mods) {
+		debug version(log_mouse_events) writefln("Key: ", key, ", ", action);
 		keys.update(key, action);
 	};
 
-	callback.characterCallback = (int character, int state) {
-		debug
-			version(log_mouse_events)
-				writefln("Character: ", character, ", ", state);
+	callback.characterCallback = (uint character) {
+		debug version(log_mouse_events) writefln("Character: %s", character);
 		char c = cast(char) character;
-		if(state == GLFW_PRESS) {
-			switch(c) {
-				case 'a':
-					scene.changeFunctionOfSelected(-1);
-					conf.clrscr();
-				break;
-				case 'd':
-					scene.changeFunctionOfSelected(1);
-					conf.clrscr();
-				break;
-				case '.':
-					scene.printPoint ^= true;
-				break;
-				case 's':
-					scene.save(conf.nextFileCounter);
-				break;
-				case 'q':
-					scene.rotateSelected(-1);
-					conf.clrscr();
-				break;
-				case 'w':
-					scene.rotateSelected(1);
-					conf.clrscr();
-				break;
-				case 'e':
-					scene.setRotVectorOfSelected();
-					conf.clrscr();
-				break;
-				case 'r':
-					scene.resetPos();
-				break;
-				case 't':
-					conf.drawTransAndAxes ^= true;
-					conf.clrscr();
-				break;
-				case 'b': {
-					debug
-						version(log_mouse_events)
-							writefln("Character == ", c);
+		switch(c) {
+			case 'a':
+				scene.changeFunctionOfSelected(-1);
+				conf.clrscr();
+			break;
+			case 'd':
+				scene.changeFunctionOfSelected(1);
+				conf.clrscr();
+			break;
+			case '.':
+				scene.printPoint ^= true;
+			break;
+			case 's':
+				scene.save(conf.nextFileCounter);
+			break;
+			case 'q':
+				scene.rotateSelected(-1);
+				conf.clrscr();
+			break;
+			case 'w':
+				scene.rotateSelected(1);
+				conf.clrscr();
+			break;
+			case 'e':
+				scene.setRotVectorOfSelected();
+				conf.clrscr();
+			break;
+			case 'r':
+				scene.resetPos();
+			break;
+			case 't':
+				conf.drawTransAndAxes ^= true;
+				conf.clrscr();
+			break;
+			case 'b': {
+				debug
+					version(log_mouse_events)
+						writefln("Character == ", c);
 
-					if(bgColor is bgColorWhite)
-						bgColor = bgColorBlack;
-					else if(bgColor is bgColorBlack)
-						bgColor = bgColorWhite;
-					else
-						bgColor = bgColorWhite;
+				if(bgColor is bgColorWhite)
+					bgColor = bgColorBlack;
+				else if(bgColor is bgColorBlack)
+					bgColor = bgColorWhite;
+				else
+					bgColor = bgColorWhite;
 
-					glClearColor(bgColor[0], bgColor[1], bgColor[2], 0.0f);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-					break;
-				}
-				case '+':
-					scene.increaseStack();
-				break;
-				case '-':
-					scene.decreaseStack();
-				break;
-				case 'u':
-					scene.resizeSelected(1, 0.1);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-				break;
-				case 'j':
-					scene.resizeSelected(1, -0.1);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-				break;
-				case 'i':
-					scene.resizeSelected(2, 0.1);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-				break;
-				case 'k':
-					scene.resizeSelected(2, -0.1);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-				break;
-				case 'o':
-					scene.resizeSelected(3, 0.1);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-				break;
-				case 'l':
-					scene.resizeSelected(3, -0.1);
-					conf.clrscr();
-					global.scene.clearImageBufferToBackgroundColor();
-				break;
-				default:
+				glClearColor(bgColor[0], bgColor[1], bgColor[2], 0.0f);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
 				break;
 			}
+			case '+':
+				scene.increaseStack();
+			break;
+			case '-':
+				scene.decreaseStack();
+			break;
+			case 'u':
+				scene.resizeSelected(1, 0.1);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
+			break;
+			case 'j':
+				scene.resizeSelected(1, -0.1);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
+			break;
+			case 'i':
+				scene.resizeSelected(2, 0.1);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
+			break;
+			case 'k':
+				scene.resizeSelected(2, -0.1);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
+			break;
+			case 'o':
+				scene.resizeSelected(3, 0.1);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
+			break;
+			case 'l':
+				scene.resizeSelected(3, -0.1);
+				conf.clrscr();
+				global.scene.clearImageBufferToBackgroundColor();
+			break;
+			default:
+			break;
 		}
 	};
 
-	debug
-		writefln("~void setCallbackDelegates()");
+	debug writefln("~void setCallbackDelegates()");
 }

@@ -27,25 +27,23 @@ package float[3] bgColorWhite = [1, 1, 1];
 package float[] bgColor;
 
 package int glslCameraPosition;
-package int glslFadeOffDist;
+__gshared int glslFadeOffDist;
 package float fadeOffDist = 100;
 
 alias std.cstream.dout o;
 
 static this() {
-	debug
-		o.writefln("global.static this()");
-	bgColor = bgColorBlack;
+	debug o.writefln("global.static this()");
+	bgColor = bgColorWhite;
 }
 
 void init() {
-	debug
-		o.writefln("Init Config...");
+	debug o.writefln("Init Config...");
 	conf = new Config("ifs3d_init.txt");
 	loop = new GameLoop;
 	mouse = new MouseState;
 	keys = new KeysState;
 	scene = new Scene;
-	//consoleThread = new ConsoleThread;
-	//consoleThread.start;
+	consoleThread = new ConsoleThread;
+	consoleThread.start;
 }

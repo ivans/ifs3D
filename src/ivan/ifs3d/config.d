@@ -44,8 +44,7 @@ class Config {
 	}
 
 	void saveConfigFile(string fileName) {
-		debug
-			writeln("Saving config file to ", fileName);
+		debug writeln("Saving config file to ", fileName);
 		std.stream.File f = new std.stream.File(fileName, FileMode.OutNew);
 		printParams(f);
 		f.close();
@@ -53,8 +52,7 @@ class Config {
 	}
 
 	void loadConfigFile(string fileName) {
-		debug
-			writeln("Loading config file from ", fileName);
+		debug writeln("Loading config file from ", fileName);
 		char[] key;
 		char[] value;
 		std.stream.File f = new std.stream.File(fileName, FileMode.In);
@@ -85,13 +83,11 @@ class Config {
 		ulong len1 = std.c.string.strlen(freeImgVersion);
 		ulong len2 = std.c.string.strlen(freeImgCopyright);
 
-		writefln("FreeImage version: %s\nFreeImage copyright: %s",
-				freeImgVersion[0 .. len1], freeImgCopyright[0 .. len2]);
+		writefln("FreeImage version: %s\nFreeImage copyright: %s", freeImgVersion[0 .. len1], freeImgCopyright[0 .. len2]);
 	}
 
 	void initGlfw() {
-		//		debug
-		//			global.o.writefln("Init GLFW and get current desktop mode...");
+		//		debug global.o.writefln("Init GLFW and get current desktop mode...");
 		InitFreeImage();
 		glfwInit();
 		int v1, v2, v3;
@@ -158,13 +154,11 @@ class Config {
 
 			string vertexShaderSrc = import("vertexShader.glsl");
 
-			writefln("Shader = %s, with source = %s", vertexShader,
-					vertexShaderSrc);
+			writefln("Shader = %s, with source = %s", vertexShader,	vertexShaderSrc);
 
 			string fragmentShaderSrc = import("fragmentShader.glsl");
 
-			writefln("Shader = %s, with source = %s", fragmentShader,
-					fragmentShaderSrc);
+			writefln("Shader = %s, with source = %s", fragmentShader, fragmentShaderSrc);
 
 			char* srcVertexShader = cast(char*) &vertexShaderSrc[0];
 			char* srcFragmentShader = cast(char*) &fragmentShaderSrc[0];
@@ -181,8 +175,7 @@ class Config {
 			gl3.glAttachShader(p, fragmentShader);
 			gl3.glLinkProgram(p);
 
-			global.glslCameraPosition = gl3.glGetUniformLocation(p,
-					"CameraPosition");
+			global.glslCameraPosition = gl3.glGetUniformLocation(p,	"CameraPosition");
 			global.glslFadeOffDist = gl3.glGetUniformLocation(p, "FadeOffDist");
 
 			printLog("program: ", p);
@@ -211,8 +204,7 @@ class Config {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 
-		gluPerspective(
-				45,
+		gluPerspective(45,
 				cast(GLfloat) conf.getIntParam("resX") / cast(GLfloat) conf.getIntParam(
 						"resY"), 0.1f, 10000.0f);
 		gluLookAt(scene.cameraPosition.x, scene.cameraPosition.y,
@@ -223,8 +215,7 @@ class Config {
 	void setOrtho() {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, global.conf.getIntParam("resX"), global.conf.getIntParam(
-				"resY"), 0, 0, 1.0);
+		glOrtho(0, global.conf.getIntParam("resX"), global.conf.getIntParam("resY"), 0, 0, 1.0);
 	}
 
 	void setModelView() {

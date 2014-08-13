@@ -17,8 +17,8 @@ private {
 
 class Scene {
 	this() {
-		cameraPosition = Point(0.5, 3, 10);
-		cameraLookAt = Point(0, 0, 0);
+		cameraPosition = Point(1, 1, 3);
+		cameraLookAt = Point(1, 1, 0);
 		int w = global.conf.getIntParam("picResX");
 		int h = global.conf.getIntParam("picResY");
 		version(in_mem_buffer_with_z) {
