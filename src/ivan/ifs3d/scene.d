@@ -512,6 +512,6 @@ class Scene {
 		colorBuffer.length = POINTS_PER_ITERATION;
 		version(in_mem_buffer_with_z)
 			feedbackBuffer.length = POINTS_PER_ITERATION * 8; //token x y z r g b a;
-		moveStack.length = 2;
+		moveStack.length = 5;
 	}
 }

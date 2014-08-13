@@ -44,6 +44,6 @@ void init() {
 	mouse = new MouseState;
 	keys = new KeysState;
 	scene = new Scene;
-	consoleThread = new ConsoleThread;
-	consoleThread.start;
+	//consoleThread = new ConsoleThread;
+	//consoleThread.start;
 }

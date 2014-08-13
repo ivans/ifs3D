@@ -45,8 +45,7 @@ int main(string[] args) {
 	global.scene.updateTransformationMatrix();
 
 	if(args.length == 2) {
-		debug
-			writefln("Loading scene from file %s given as argument.", args[1]);
+		debug writefln("Loading scene from file %s given as argument.", args[1]);
 		global.scene = new Scene(new std.stream.File(args[1], FileMode.In));
 	}
 
@@ -77,6 +76,7 @@ int main(string[] args) {
 		}
 
 		glfwSwapBuffers(global.glfwWindow);
+		glfwPollEvents();
 		//		global.o.flush();
 
 		processMouseEvents();

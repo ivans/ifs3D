@@ -29,7 +29,6 @@ class GameLoop {
 			frames = 0;
 
 			string titlestr = std.string.format("3D IFS (%sfps)\0", fps);
-			debug writefln("%s", titlestr);
 			glfwSetWindowTitle( global.glfwWindow, cast(char*)titlestr.ptr );
 		}
 		frames++;
