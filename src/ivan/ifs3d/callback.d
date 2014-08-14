@@ -16,31 +16,25 @@ void delegate(uint character) characterCallback;
 extern(System):
 
 	void windowResizeFunc(GLFWwindow* glfwWindow, int w, int h) {
-		debug writefln("windowResizeFunc");
 		windowResize(w, h);
 	}
 
 	void mouseWheelFunc(GLFWwindow* glfwWindow, double xscroll, double yscroll) {
-		debug writefln("mouseWheelFunc");
 		mouseWheel(xscroll, yscroll);
 	}
 
 	void mousePosFunc(GLFWwindow* glfwWindow, double x, double y) {
-		debug writefln("mousePosFunc");
 		mousePos(x, y);
 	}
 
 	void mouseButtonFunc(GLFWwindow* glfwWindow, int button, int action, int mods) {
-		debug writefln("mouseButtonFunc");
 		mouseButton(button, action, mods);
 	}
 
 	void keyCallbackFunc(GLFWwindow* glfwWindow, int key, int scancode, int action, int mods) {
-		debug writefln("keyCallbackFunc");
 		keyCallback(key, scancode, action, mods);
 	}
 
 	void characterCallbackFunc(GLFWwindow* glfwWindow, uint character) {
-		debug writefln("characterCallbackFunc");
 		characterCallback(character);
 	}

@@ -39,6 +39,8 @@ class KeysState {
 			case GLFW_KEY_LEFT_ALT: this.lAlt = true; break;
 			case GLFW_KEY_LEFT: this.Left = true; break;
 			case GLFW_KEY_RIGHT: this.Right = true; break;
+			case GLFW_KEY_UP: this.Up = true; break;
+			case GLFW_KEY_DOWN: this.Down = true; break;
 			case GLFW_KEY_INSERT: this.insert = true; break;
 			case GLFW_KEY_DELETE: this.del = true; break;
 			default: break;
@@ -50,6 +52,8 @@ class KeysState {
 				case GLFW_KEY_LEFT_ALT: this.lAlt = false; break;
 				case GLFW_KEY_LEFT: this.Left = false; break;
 				case GLFW_KEY_RIGHT: this.Right = false; break;
+				case GLFW_KEY_UP: this.Up = false; break;
+				case GLFW_KEY_DOWN: this.Down = false; break;
 				case GLFW_KEY_INSERT: this.insert = false; break;
 				case GLFW_KEY_DELETE: this.del = false; break;
 				default: break;

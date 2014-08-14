@@ -258,8 +258,7 @@ class Transformation {
 		}
 	}
 
-	static void transformPoint(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z,
-			ref ifsfloat[4][4] m) {
+	static void transformPoint(ref ifsfloat x, ref ifsfloat y, ref ifsfloat z, ref ifsfloat[4][4] m) {
 		ifsfloat x2, y2, z2, h2;
 
 		x2 = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3] * 1;
@@ -279,11 +278,9 @@ class Transformation {
 	}
 
 	//transform from 'from' to 'this'
-	private void CalculateTransformationMatrix(Transformation from,
-			ref ifsfloat[4][4] mat) {
+	private void CalculateTransformationMatrix(Transformation from, ref ifsfloat[4][4] mat) {
 		static counter = 0;
-		debug
-			writefln("Calculating transformation matrix %s", counter++);
+		debug writefln("Calculating transformation matrix %s", counter++);
 		Transformation to = this;
 		ifsfloat[4][4] M1 = [
 			[1, 0, 0, -from.X],
@@ -314,14 +311,9 @@ class Transformation {
 		Mul4Matrix(temp, M3, mat);
 		Mul4Matrix(mat, M2, temp);
 		Mul4Matrix(temp, M1, mat);
-
-		//		debug
-		//			writeln(matrix);
-
 	}
 
-	void Mul4Matrix(ref const(ifsfloat[4][4]) a, ref const(ifsfloat[4][4]) b,
-			ref ifsfloat[4][4] c) {
+	void Mul4Matrix(ref const(ifsfloat[4][4]) a, ref const(ifsfloat[4][4]) b, ref ifsfloat[4][4] c) {
 		ifsfloat sum;
 		for(int row = 0; row < 4; row++) {
 			for(int col = 0; col < 4; col++) {
@@ -336,8 +328,7 @@ class Transformation {
 		}
 	}
 
-	public static void MakeRotationMatrix(ifsfloat ra, ifsfloat rx,
-			ifsfloat ry, ifsfloat rz, ref ifsfloat[4][4] mat) {
+	public static void MakeRotationMatrix(ifsfloat ra, ifsfloat rx, ifsfloat ry, ifsfloat rz, ref ifsfloat[4][4] mat) {
 		ifsfloat w = cast(ifsfloat) cos(ra / 2);
 		ifsfloat x = rx * cast(ifsfloat) sin(ra / 2);
 		ifsfloat y = ry * cast(ifsfloat) sin(ra / 2);

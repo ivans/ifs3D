@@ -205,21 +205,21 @@ void setCallbackDelegates() {
 	};
 
 	callback.mouseWheel = (double xscroll, double yscroll) {
-		debug version(log_mouse_events) writefln("Mouse: scroll: %s", yscroll);
-		mouse.WheelDelta = cast(int)(yscroll - mouse.WheelPos);
-		mouse.WheelPos = cast(int)yscroll;
+		//debug version(log_mouse_events) writefln("Mouse: scroll: %s, %s", xscroll, yscroll);
+		mouse.WheelDelta =  cast(int)yscroll;
+		mouse.WheelPos = cast(int)(mouse.WheelPos + yscroll);
 	};
 
 	callback.mousePos = (double x, double y) {
 		mouse.XDelta = cast(int)(x - mouse.X);
 		mouse.YDelta = cast(int)(y - mouse.Y);
-		debug version(log_mouse_events) writefln("Mouse: pos(%s, %s), delta(%s, %s)", x, y, mouse.XDelta, mouse.YDelta);
+		//debug version(log_mouse_events) writefln("Mouse: pos(%s, %s), delta(%s, %s)", x, y, mouse.XDelta, mouse.YDelta);
 		mouse.X = x;
 		mouse.Y = y;
 	};
 
 	callback.mouseButton = (int button, int action, int mods) {
-		debug version(log_mouse_events) writefln("Mouse: button: %s, action: %s", button, action);
+		//debug version(log_mouse_events) writefln("Mouse: button: %s, action: %s", button, action);
 
 		mouse.LeftOld = mouse.Left;
 		mouse.RightOld = mouse.Right;
@@ -243,12 +243,12 @@ void setCallbackDelegates() {
 	};
 
 	callback.keyCallback = (int key, int scancode, int action, int mods) {
-		debug version(log_mouse_events) writefln("Key: ", key, ", ", action);
+		//debug version(log_mouse_events) writefln("Key: ", key, ", ", action);
 		keys.update(key, action);
 	};
 
 	callback.characterCallback = (uint character) {
-		debug version(log_mouse_events) writefln("Character: %s", character);
+		//debug version(log_mouse_events) writefln("Character: %s", character);
 		char c = cast(char) character;
 		switch(c) {
 			case 'a':
@@ -284,10 +284,13 @@ void setCallbackDelegates() {
 				conf.drawTransAndAxes ^= true;
 				conf.clrscr();
 			break;
+			case 'c':
+				global.scene.clearImageBufferToBackgroundColor();
+				conf.clrscr();
+			break;
 			case 'b': {
 				debug
-					version(log_mouse_events)
-						writefln("Character == ", c);
+					version(log_mouse_events) writefln("Character == ", c);
 
 				if(bgColor is bgColorWhite)
 					bgColor = bgColorBlack;
@@ -310,32 +313,26 @@ void setCallbackDelegates() {
 			case 'u':
 				scene.resizeSelected(1, 0.1);
 				conf.clrscr();
-				global.scene.clearImageBufferToBackgroundColor();
 			break;
 			case 'j':
 				scene.resizeSelected(1, -0.1);
 				conf.clrscr();
-				global.scene.clearImageBufferToBackgroundColor();
 			break;
 			case 'i':
 				scene.resizeSelected(2, 0.1);
 				conf.clrscr();
-				global.scene.clearImageBufferToBackgroundColor();
 			break;
 			case 'k':
 				scene.resizeSelected(2, -0.1);
 				conf.clrscr();
-				global.scene.clearImageBufferToBackgroundColor();
 			break;
 			case 'o':
 				scene.resizeSelected(3, 0.1);
 				conf.clrscr();
-				global.scene.clearImageBufferToBackgroundColor();
 			break;
 			case 'l':
 				scene.resizeSelected(3, -0.1);
 				conf.clrscr();
-				global.scene.clearImageBufferToBackgroundColor();
 			break;
 			default:
 			break;
