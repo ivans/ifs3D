@@ -62,8 +62,7 @@ int main(string[] args) {
 		global.conf.setModelView();
 		//crtaj fraktal
 
-		gl3.glUniform3f(global.glslCameraPosition, scene.cameraPosition.x,
-				scene.cameraPosition.y, scene.cameraPosition.z);
+		gl3.glUniform3f(global.glslCameraPosition, scene.cameraPosition.x, scene.cameraPosition.y, scene.cameraPosition.z);
 		gl3.glUniform1f(global.glslFadeOffDist, global.fadeOffDist);
 
 		scene.draw();
@@ -141,7 +140,7 @@ void processMouseEvents() {
 	}
 
 	if(mouse.WheelDelta != 0) {
-		scene.ZoomCamera(mouse.WheelDelta);
+		scene.ZoomCamera(-mouse.WheelDelta);
 		conf.clrscr();
 	}
 
@@ -171,12 +170,12 @@ void processMouseEvents() {
 	}
 
 	if(keys.Up == true) {
-		global.fadeOffDist -= 1;
+		global.fadeOffDist += 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
 		Thread.sleep(dur!("msecs")(100));
 	}
 	if(keys.Down == true) {
-		global.fadeOffDist += 1;
+		global.fadeOffDist -= 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
 		Thread.sleep(dur!("msecs")(100));
 	}

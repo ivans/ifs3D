@@ -33,8 +33,8 @@ package float fadeOffDist = 100;
 alias std.cstream.dout o;
 
 static this() {
-	debug o.writefln("global.static this()");
-	bgColor = bgColorWhite;
+	debug writefln("global.static this()");
+	bgColor = bgColorBlack;
 }
 
 void init() {

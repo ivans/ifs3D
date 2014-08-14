@@ -15,6 +15,8 @@ private {
 }
 alias ivan.ifs3d.global global;
 
+version = vertex_shaders;
+
 class Config {
 	this(string fileName) {
 		intParams["fileCounter"] = 0;
@@ -147,45 +149,47 @@ class Config {
 			mixin(gl3.getMethodPointer("glUniform3f"));
 			mixin(gl3.getMethodPointer("glUniform1f"));
 
-			//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
+				//http://www.lighthouse3d.com/opengl/glsl/index.php?oglexample1
 
-			GLuint vertexShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
-			GLuint fragmentShader = gl3.glCreateShader(gl3.GL_FRAGMENT_SHADER);
+			version (vertex_shaders) {
 
-			string vertexShaderSrc = import("vertexShader.glsl");
+				GLuint vertexShader = gl3.glCreateShader(gl3.GL_VERTEX_SHADER);
+				GLuint fragmentShader = gl3.glCreateShader(gl3.GL_FRAGMENT_SHADER);
 
-			writefln("Shader = %s, with source = %s", vertexShader,	vertexShaderSrc);
+				string vertexShaderSrc = import("vertexShader.glsl");
 
-			string fragmentShaderSrc = import("fragmentShader.glsl");
+				writefln("Shader = %s, with source = %s", vertexShader,	vertexShaderSrc);
 
-			writefln("Shader = %s, with source = %s", fragmentShader, fragmentShaderSrc);
+				string fragmentShaderSrc = import("fragmentShader.glsl");
 
-			char* srcVertexShader = cast(char*) &vertexShaderSrc[0];
-			char* srcFragmentShader = cast(char*) &fragmentShaderSrc[0];
+				writefln("Shader = %s, with source = %s", fragmentShader, fragmentShaderSrc);
 
-			gl3.glShaderSource(vertexShader, 1, &srcVertexShader, null);
-			gl3.glShaderSource(fragmentShader, 1, &srcFragmentShader, null);
-			gl3.glCompileShader(vertexShader);
-			printLog("vertexShader: ", vertexShader);
-			gl3.glCompileShader(fragmentShader);
-			printLog("fragmentShader: ", fragmentShader);
+				char* srcVertexShader = cast(char*) &vertexShaderSrc[0];
+				char* srcFragmentShader = cast(char*) &fragmentShaderSrc[0];
 
-			auto p = gl3.glCreateProgram();
-			gl3.glAttachShader(p, vertexShader);
-			gl3.glAttachShader(p, fragmentShader);
-			gl3.glLinkProgram(p);
+				gl3.glShaderSource(vertexShader, 1, &srcVertexShader, null);
+				gl3.glShaderSource(fragmentShader, 1, &srcFragmentShader, null);
+				gl3.glCompileShader(vertexShader);
+				printLog("vertexShader: ", vertexShader);
+				gl3.glCompileShader(fragmentShader);
+				printLog("fragmentShader: ", fragmentShader);
 
-			global.glslCameraPosition = gl3.glGetUniformLocation(p,	"CameraPosition");
-			global.glslFadeOffDist = gl3.glGetUniformLocation(p, "FadeOffDist");
+				auto p = gl3.glCreateProgram();
+				gl3.glAttachShader(p, vertexShader);
+				gl3.glAttachShader(p, fragmentShader);
+				gl3.glLinkProgram(p);
 
-			printLog("program: ", p);
-			gl3.glUseProgram(p);
+				global.glslCameraPosition = gl3.glGetUniformLocation(p,	"CameraPosition");
+				global.glslFadeOffDist = gl3.glGetUniformLocation(p, "FadeOffDist");
 
-			writeln("After shader source i compile");
+				printLog("program: ", p);
+				gl3.glUseProgram(p);
+
+				writeln("After shader source i compile");
+			}
 		} else {
 			debug writefln("Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 		}
-
 	}
 
 	void registerCallbacks() {
