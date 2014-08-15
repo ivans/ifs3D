@@ -361,6 +361,7 @@ class Scene {
 
 	void selectNextTransformation() {
 		selectedTrans = cast(int)((selectedTrans + 1) % transformations.length);
+		writefln("Selected tansformation: %s", selectedTrans);
 	}
 
 	void selectPrevTransformation() {
@@ -368,6 +369,7 @@ class Scene {
 		if(selectedTrans < 0) {
 			selectedTrans += transformations.length;
 		}
+		writefln("Selected tansformation: %s", selectedTrans);
 	}
 
 	void deleteTransformation() {
@@ -509,7 +511,7 @@ class Scene {
 		[155,   0,  55]
 	, ];
 
-	static int POINTS_PER_ITERATION = 2_000;
+	static int POINTS_PER_ITERATION = 20_000;
 
 	version(in_mem_buffer_with_z) {
 		FIBITMAP* buffer;

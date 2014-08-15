@@ -286,6 +286,7 @@ void setCallbackDelegates() {
 				conf.clrscr();
 			break;
 			case 'c':
+				writefln("Clearing screen and background buffer...");
 				global.scene.clearImageBufferToBackgroundColor();
 				conf.clrscr();
 			break;
