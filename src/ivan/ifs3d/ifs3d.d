@@ -289,6 +289,10 @@ void setCallbackDelegates() {
 				global.scene.clearImageBufferToBackgroundColor();
 				conf.clrscr();
 			break;
+			case 'v':
+				global.conf.nextVertexShaderProgram();
+				conf.clrscr();
+			break;
 			case 'b': {
 				debug
 					version(log_mouse_events) writefln("Character == ", c);

@@ -229,10 +229,7 @@ class Scene {
 	}
 
 	public void ZoomCamera(int mouseYDelta) {
-		debug
-			writefln(
-					"ZoomCamera, cameraPos = %s, cameraLookAt = %s, mouseYDela = %s",
-					cameraPosition, cameraLookAt, mouseYDelta);
+		debug writefln("ZoomCamera, cameraPos = %s, cameraLookAt = %s, mouseYDela = %s", cameraPosition, cameraLookAt, mouseYDelta);
 		ifsfloat vx = cameraPosition.x - cameraLookAt.x;
 		ifsfloat vy = cameraPosition.y - cameraLookAt.y;
 		ifsfloat vz = cameraPosition.z - cameraLookAt.z;
@@ -277,12 +274,9 @@ class Scene {
 
 		ifsfloat[4][4] M;
 		Transformation.MakeRotationMatrix(mouseXDelta / 200f, 0, 1, 0, M);
-		ivan.ifs3d.transformation.Transformation.transformPoint(
-				this.cameraPosition.x, this.cameraPosition.y,
-				this.cameraPosition.z, M);
+		Transformation.transformPoint(this.cameraPosition.x, this.cameraPosition.y, this.cameraPosition.z, M);
 		Transformation.MakeRotationMatrix(mouseYDelta / 200f, vz, 0, -vx, M);
-		ivan.ifs3d.transformation.Transformation.transformPoint(
-				cameraPosition.x, cameraPosition.y, cameraPosition.z, M);
+		Transformation.transformPoint(cameraPosition.x, cameraPosition.y, cameraPosition.z, M);
 	}
 
 	public void scaleSelectedTrans(ifsfloat dx, ifsfloat dy) {
@@ -325,8 +319,7 @@ class Scene {
 
 	void updateTransformationMatrix() {
 		for(int i = 0; i < transformations.length; i++) {
-			transformations[i].CalculateTransformationMatrix2(
-					transformations[0]);
+			transformations[i].CalculateTransformationMatrix2(transformations[0]);
 		}
 	}
 

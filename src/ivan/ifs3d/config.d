@@ -18,7 +18,19 @@ alias ivan.ifs3d.global global;
 version = vertex_shaders;
 
 class Config {
+
+	GLuint[] vertexShaderPrograms;
+	ulong currentVertexShaderProgram;
+
+	this() {
+		vertexShaderPrograms.length = 2;
+		vertexShaderPrograms[0] = 0;
+		currentVertexShaderProgram = 0;
+	}
+
 	this(string fileName) {
+		this();
+
 		intParams["fileCounter"] = 0;
 		intParams["iterationsWhenSaving"] = 10000;
 		intParams["depthBits"] = 32;
@@ -182,14 +194,20 @@ class Config {
 				global.glslCameraPosition = gl3.glGetUniformLocation(p,	"CameraPosition");
 				global.glslFadeOffDist = gl3.glGetUniformLocation(p, "FadeOffDist");
 
-				printLog("program: ", p);
-				gl3.glUseProgram(p);
+				vertexShaderPrograms[1] = p;
 
 				writeln("After shader source i compile");
 			}
 		} else {
 			debug writefln("Nemamo :( GL_ARB_vertex_shader i GL_ARB_fragment_shader");
 		}
+	}
+
+	void nextVertexShaderProgram() {
+		currentVertexShaderProgram = (currentVertexShaderProgram + 1) % vertexShaderPrograms.length;
+		auto p = vertexShaderPrograms[currentVertexShaderProgram];
+		writefln("Switching vertex shader program to %s", p);
+		gl3.glUseProgram(p);
 	}
 
 	void registerCallbacks() {
