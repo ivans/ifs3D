@@ -1,4 +1,4 @@
 3D IFS Simulation
 
 Compile with:
-dmd -g ivan\ifs3d\ifs3d.d ivan\ifs3d\config.d ivan\ifs3d\callback.d ivan\ifs3d\keysstate.d ivan\ifs3d\point.d ivan\ifs3d\global.d ivan\ifs3d\writetga.d ivan\ifs3d\gameloop.d ivan\ifs3d\consolethread.d ivan\ifs3d\mousestate.d ivan\ifs3d\transformation.d ivan\ifs3d\scene.d ivan\ifs3d\gl3.d -Jivan\ifs3d\shaders
+dub
