@@ -172,11 +172,13 @@ void processMouseEvents() {
 	if(keys.Up == true) {
 		global.fadeOffDist += 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
+		conf.clrscr();
 		Thread.sleep(dur!("msecs")(100));
 	}
 	if(keys.Down == true) {
 		global.fadeOffDist -= 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
+		conf.clrscr();
 		Thread.sleep(dur!("msecs")(100));
 	}
 

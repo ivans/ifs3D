@@ -75,9 +75,19 @@ class Scene {
 
 	void fillDisplayList() {
 		for(int i = 0; i < POINTS_PER_ITERATION; i++) {
-			colorBuffer[i][0] = getColor(0);
-			colorBuffer[i][1] = getColor(1);
-			colorBuffer[i][2] = getColor(2);
+			int sumR = 0, sumG = 0, sumB = 0;
+			for(int msi = cast(int)(moveStack.length-1); msi >= 0; msi--) {
+				sumR += colors[(moveStack[msi]) % colors.length][0];
+				sumG += colors[(moveStack[msi]) % colors.length][1];
+				sumB += colors[(moveStack[msi]) % colors.length][2];
+			}
+			colorBuffer[i][0] = cast(ubyte) (sumR / moveStack.length);
+			colorBuffer[i][1] = cast(ubyte) (sumG / moveStack.length);
+			colorBuffer[i][2] = cast(ubyte) (sumB / moveStack.length);
+
+			//colorBuffer[i][0] = getColor(0);
+			//colorBuffer[i][1] = getColor(1);
+			//colorBuffer[i][2] = getColor(2);
 
 			positions[i][0] = x;
 			positions[i][1] = y;
@@ -87,10 +97,7 @@ class Scene {
 				transformations[lastTr = nlRand()].transformPoint(x, y, z);
 
 			synchronized(this) {
-				for(int k = 1; k < moveStack.length; k++) {
-					moveStack[k - 1] = moveStack[k];
-				}
-				moveStack[moveStack.length - 1] = lastTr;
+				moveStack[moveStackPos = (moveStackPos + 1) % moveStack.length] = lastTr;
 			}
 		}
 	}
@@ -335,15 +342,27 @@ class Scene {
 
 	void drawCoordinateSystem() {
 		glBegin(GL_LINES);
+		// red axis
 		glColor3f(1, 0, 0);
-		glVertex2f(0, 0);
-		glVertex2f(5, 0);
+		glVertex2f(-5, 0);glVertex2f(5, 0);
+		glVertex2f(-5, -1);glVertex2f(5, -1);
+		glVertex2f(-5, 1);glVertex2f(5, 1);
+		glVertex2f(-5, -2);glVertex2f(5, -2);
+		glVertex2f(-5, 2);glVertex2f(5, 2);
+		// green axis
 		glColor3f(0, 1, 0);
-		glVertex2f(0, 0);
-		glVertex2f(0, 5);
+		glVertex2f(0, -5);glVertex2f(0, 5);
+		glVertex2f(-1, -5);glVertex2f(-1, 5);
+		glVertex2f(1, -5);glVertex2f(1, 5);
+		glVertex2f(-2, -5);glVertex2f(-2, 5);
+		glVertex2f(2, -5);glVertex2f(2, 5);
+		// blue axis
 		glColor3f(0, 0, 1);
-		glVertex2f(0, 0);
-		glVertex3f(0, 0, 5);
+		glVertex3f(0, 0, -5);glVertex3f(0, 0, 5);
+		glVertex3f(0, -1, -5);glVertex3f(0, -1, 5);
+		glVertex3f(0, 1, -5);glVertex3f(0, 1, 5);
+		glVertex3f(0, -2, -5);glVertex3f(0, -2, 5);
+		glVertex3f(0, 2, -5);glVertex3f(0, 2, 5);
 		glEnd();
 	}
 
@@ -381,8 +400,7 @@ class Scene {
 		if(selectedTrans == 0) {
 			this.updateTransformationMatrix();
 		} else {
-			transformations[selectedTrans].CalculateTransformationMatrix2(
-					transformations[0]);
+			transformations[selectedTrans].CalculateTransformationMatrix2(transformations[0]);
 		}
 	}
 
@@ -510,6 +528,7 @@ class Scene {
 	static float[3][] positions;
 	static ubyte[3][] colorBuffer;
 	static short[] moveStack;
+	static uint moveStackPos = 0;
 
 	static this() {
 		positions.length = POINTS_PER_ITERATION;
