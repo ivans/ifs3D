@@ -1,9 +1,9 @@
 module ivan.ifs3d.ifs3d;
 
 private {
-	import std.stream, std.cstream;
 	import std.stdio, std.string;
 	import core.thread;
+	import core.stdc.string : strlen;
 	import deimos.glfw.glfw3, freeimage;
 	import ivan.ifs3d.config;
 	import ivan.ifs3d.scene;
@@ -14,12 +14,12 @@ private {
 	alias ivan.ifs3d.global global;
 
 	import ivan.ifs3d.callback;
-	import gl;
+	import gl, gl3 = ivan.ifs3d.gl3, glu;
 
 	alias ivan.ifs3d.callback callback;
 }
 
-import std.c.process;
+import core.stdc.stdlib;
 
 //pragma(lib, "glfwdll.lib");
 //pragma(lib, "opengl32.lib");
@@ -90,10 +90,10 @@ int main(string[] args) {
 	auto glVendor = cast(char*) glGetString(GL_VENDOR);
 	auto glExtensions = cast(char*) glGetString(GL_EXTENSIONS);
 
-	writefln("GL_RENDERER   = %s", glRenderer[0 .. std.c.string.strlen(glRenderer)]);
-	writefln("GL_VERSION    = %s", glVersion[0 .. std.c.string.strlen(glVersion)]);
-	writefln("GL_VENDOR     = %s", glVendor[0 .. std.c.string.strlen(glVendor)]);
-	writefln("GL_EXTENSIONS = %s", glExtensions[0 .. std.c.string.strlen(glExtensions)]);
+	writefln("GL_RENDERER   = %s", glRenderer[0 .. strlen(glRenderer)]);
+	writefln("GL_VERSION    = %s", glVersion[0 .. strlen(glVersion)]);
+	writefln("GL_VENDOR     = %s", glVendor[0 .. strlen(glVendor)]);
+	writefln("GL_EXTENSIONS = %s", glExtensions[0 .. strlen(glExtensions)]);
 
 	try {
 		writefln("Starting main loop...");
@@ -117,7 +117,7 @@ int main(string[] args) {
 
 void processMouseEvents() {
 	if(mouse.Left == true) {
-		if(keys.lShift == true) {
+		if(mykeys.lShift == true) {
 			scene.moveCameraLookAt(mouse.XDelta, mouse.YDelta);
 			conf.clrscr();
 		} else {
@@ -127,10 +127,10 @@ void processMouseEvents() {
 	}
 
 	if(mouse.Right == true) {
-		if(keys.lAlt == true) {
+		if(mykeys.lAlt == true) {
 			scene.scaleSelectedTrans(mouse.XDelta, mouse.YDelta);
 			conf.clrscr();
-		} else if(keys.lCtrl == true) {
+		} else if(mykeys.lCtrl == true) {
 			scene.ZoomCamera(mouse.YDelta);
 			conf.clrscr();
 		} else {
@@ -144,7 +144,7 @@ void processMouseEvents() {
 		conf.clrscr();
 	}
 
-	if(keys.insert == true) {
+	if(mykeys.insert == true) {
 		scene.addTr(new Transformation(0, 0, 0, 1, 1, 1));
 		scene.selectedTrans = cast(int)scene.transformations.length - 1;
 		scene.resetPos();
@@ -152,30 +152,30 @@ void processMouseEvents() {
 		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
-	if(keys.del == true) {
+	if(mykeys.del == true) {
 		scene.deleteTransformation();
 		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
 
-	if(keys.Left == true) {
+	if(mykeys.Left == true) {
 		scene.selectPrevTransformation;
 		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
-	if(keys.Right == true) {
+	if(mykeys.Right == true) {
 		scene.selectNextTransformation;
 		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
 
-	if(keys.Up == true) {
+	if(mykeys.Up == true) {
 		global.fadeOffDist += 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
 		conf.clrscr();
 		Thread.sleep(dur!("msecs")(100));
 	}
-	if(keys.Down == true) {
+	if(mykeys.Down == true) {
 		global.fadeOffDist -= 1;
 		writefln("FadeOffDist is now %s", global.fadeOffDist);
 		conf.clrscr();
@@ -245,7 +245,7 @@ void setCallbackDelegates() {
 
 	callback.keyCallback = (int key, int scancode, int action, int mods) {
 		//debug version(log_mouse_events) writefln("Key: ", key, ", ", action);
-		keys.update(key, action);
+		mykeys.update(key, action);
 	};
 
 	callback.characterCallback = (uint character) {

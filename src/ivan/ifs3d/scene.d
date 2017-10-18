@@ -2,12 +2,14 @@
 
 private {
 	import deimos.glfw.glfw3, freeimage, gl;
+	import std.conv : to;
 	import std.math;
 	import std.random;
+	import std.format : formattedRead;
 	import ivan.ifs3d.point;
 	import ivan.ifs3d.transformation;
 	import std.stdio;
-	import std.stream, std.cstream;
+	import std.string : format;
 	import ivan.ifs3d.writetga;
 	import ivan.ifs3d.config;
 	import ivan.ifs3d.types;
@@ -28,7 +30,7 @@ class Scene {
 		clearImageBufferToBackgroundColor;
 	}
 
-	this(Stream s) {
+	this(string s) {
 		this();
 		int count;
 		s.readf(&count);
@@ -44,23 +46,21 @@ class Scene {
 					cameraLookAt.toString);
 			writeln(count, " transformations");
 			foreach(Transformation t; transformations) {
-				t.toStreamNice(dout);
+				writefln(t.toStream());
 			}
 		}
 		this.updateTransformationMatrix();
 		this.recalculateVolume();
 	}
 
-	void toStream(Stream s) {
-		writefln("scene.toStream begin");
-		s.writefln(transformations.length);
-		s.writefln("%s %s %s", cameraPosition.x, cameraPosition.y,
-				cameraPosition.z);
-		s.writefln("%s %s %s", cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
+	string toStream() {
+		string result = format("%s\n", transformations.length.to!string);
+		result ~= format("%s %s %s\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		result ~= format("%s %s %s\n", cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
 		foreach(t; transformations) {
-			t.toStream(s);
+			result ~= t.toString;
 		}
-		writefln("scene.toStream end");
+		return result;
 	}
 
 	void drawOciste() {
@@ -434,24 +434,23 @@ class Scene {
 
 	void save(int n) {
 		// save file names
-		string definition     = std.string.format("fractal%05d.ifs3d\0",n);
-		string picture        = std.string.format("fractal%05d.jpeg\0",n);
-		string pictureHighres = std.string.format("fractal%05d-highres.jpeg\0",n);
-		string pictureBicubic = std.string.format("fractal%05d-bicubic.jpeg\0",n);
+		string definition     = format("fractal%05d.ifs3d\0",n);
+		string picture        = format("fractal%05d.jpeg\0",n);
+		string pictureHighres = format("fractal%05d-highres.jpeg\0",n);
+		string pictureBicubic = format("fractal%05d-bicubic.jpeg\0",n);
 
 		// save scene definition
-		global.o.writefln("Saving scene definition file...");
-		global.o.flush();
-		this.toStream(new std.stream.File(definition, FileMode.Out));
+		writefln("Saving scene definition file...");
+		auto File f = File(definition, "rw");
+		f.write("%s", t.toStrema());
 
 		// save highres image
 		version(in_mem_buffer_with_z) {
-			global.o.writef(std.string.format("Saving high res (%sx%s) image...", global.conf.getIntParam("picResX"), global.conf.getIntParam("picResY")));
-			global.o.flush();
+			writef(format("Saving high res (%sx%s) image...", global.conf.getIntParam("picResX"), global.conf.getIntParam("picResY")));
 			FIBITMAP* nova24bit = FreeImage_ConvertTo24Bits(buffer);
 			FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG, nova24bit, cast(char*)pictureHighres, JPEG_QUALITYSUPERB);
 			FreeImage_Unload(nova24bit);
-			global.o.writefln(" done");
+			writefln(" done");
 
 			FIBITMAP* pict32bit = FreeImage_ConvertTo32Bits(buffer);
 			FreeImage_AdjustGamma(pict32bit, (global.conf.getIntParam("adjGamma")+100)/20);
@@ -459,18 +458,17 @@ class Scene {
 			FreeImage_AdjustContrast(pict32bit, global.conf.getIntParam("adjContrast"));
 			FIBITMAP* nova = FreeImage_Rescale(pict32bit, global.conf.getIntParam("picSmallX"), global.conf.getIntParam("picSmallY"), FREE_IMAGE_FILTER.FILTER_BICUBIC);
 			nova24bit = FreeImage_ConvertTo24Bits(nova);
-			global.o.writef(std.string.format("Saving resampled (%sx%s) image...", global.conf.getIntParam("picSmallX"), global.conf.getIntParam("picSmallY")));
-			global.o.flush();
+			writef(format("Saving resampled (%sx%s) image...", global.conf.getIntParam("picSmallX"), global.conf.getIntParam("picSmallY")));
 			FreeImage_Save(FREE_IMAGE_FORMAT.FIF_JPEG,nova24bit,cast(char*)pictureBicubic,JPEG_QUALITYSUPERB);
-			global.o.writefln(" done");
+			writefln(" done");
 			FreeImage_Unload(nova);
 			FreeImage_Unload(nova24bit);
 			FreeImage_Unload(pict32bit);
 		}
 
-		global.o.writef("Saving screen capture image..."); global.o.flush();
+		writef("Saving screen capture image...");
 		saveImage(picture);
-		global.o.writefln(" done");
+		writefln(" done");
 	}
 
 	void resetPos() {

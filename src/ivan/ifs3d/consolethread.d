@@ -2,11 +2,11 @@ module ivan.ifs3d.consolethread;
 
 import global = ivan.ifs3d.global;
 import core.thread;
+import std.conv : to;
 import std.string;
-import std.stdio;
-import std.c.time;
-import std.c.stdio;
-import std.cstream;
+import std.stdio : readln, writefln;
+import core.stdc.time;
+import core.stdc.stdio;
 
 public class ConsoleThread: Thread {
 
@@ -17,17 +17,17 @@ public class ConsoleThread: Thread {
 	private void run() {
 		writefln("Starting console thread...");
 		while(term != true) {
-			char[] line = din.readLine();
+			string line = readln();
 			writefln("Command is %s", line);
-			char[][] parts = line.split();
+			string[] parts = line.split();
 			if(parts.length == 2) {
 				try {
-					global.conf.setIntParam(cast(string) parts[0], std.conv.to!(int)(parts[1]));
+					global.conf.setIntParam(cast(string) parts[0], to!(int)(parts[1]));
 				} catch(Exception e) {
 					writefln(e.msg);
 				}
 			}
-			global.conf.printParams(global.o);
+			global.conf.printParams();
 		}
 	}
 

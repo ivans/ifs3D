@@ -1,8 +1,10 @@
 module ivan.ifs3d.config;
 
 private {
-	import std.stream, std.string;
+	import core.stdc.string : strlen;
+
 	import std.file;
+	import std.string;
 	import std.conv;
 	import std.stdio;
 
@@ -44,11 +46,11 @@ class Config {
 
 		if(std.file.exists(fileName)) {
 			debug
-				global.o.writefln("Config file found, loading...");
+				writefln("Config file found, loading...");
 			loadConfigFile(fileName);
 		} else {
 			debug
-				global.o.writefln("Config file not found, creating...");
+				writefln("Config file not found, creating...");
 			saveConfigFile(fileName);
 		}
 
@@ -59,31 +61,33 @@ class Config {
 
 	void saveConfigFile(string fileName) {
 		debug writeln("Saving config file to ", fileName);
-		std.stream.File f = new std.stream.File(fileName, FileMode.OutNew);
-		printParams(f);
+		File f = File(fileName, "w");
+		string params = printParams();
 		f.close();
 		return;
 	}
 
 	void loadConfigFile(string fileName) {
 		debug writeln("Loading config file from ", fileName);
-		char[] key;
-		char[] value;
-		std.stream.File f = new std.stream.File(fileName, FileMode.In);
-		while(f.readf(&key, &value) != 0) {
+		string key;
+		string value;
+		File f = File(fileName, "r");
+		while(f.readf!"%s %s"(key, value) != 0) {
 			intParams[key.idup] = std.conv.to!(int)(value);
 		}
-		printParams(global.o);
+		f.write(printParams());
 		f.close();
 		return;
 	}
 
-	void printParams(Stream s) {
+	string printParams() {
+		string s = "";
 		foreach(key, value; intParams) {
 			if(key != "") {
-				s.writefln("%s %d", key, value);
+				s ~= format("%s %d\n", key, value);
 			}
 		}
+		return s;
 	}
 
 	void clrscr() {
@@ -94,8 +98,8 @@ class Config {
 		FreeImage_Initialise();
 		auto freeImgVersion = FreeImage_GetVersion();
 		auto freeImgCopyright = FreeImage_GetCopyrightMessage();
-		ulong len1 = std.c.string.strlen(freeImgVersion);
-		ulong len2 = std.c.string.strlen(freeImgCopyright);
+		ulong len1 = strlen(freeImgVersion);
+		ulong len2 = strlen(freeImgCopyright);
 
 		writefln("FreeImage version: %s\nFreeImage copyright: %s", freeImgVersion[0 .. len1], freeImgCopyright[0 .. len2]);
 	}
@@ -211,7 +215,7 @@ class Config {
 	}
 
 	void registerCallbacks() {
-		debug global.o.writefln("register callbacks... for window = %s", global.glfwWindow);
+		debug writefln("register callbacks... for window = %s", global.glfwWindow);
 		glfwSetWindowSizeCallback(global.glfwWindow, cast(GLFWwindowsizefun)&windowResizeFunc);
 		glfwSetKeyCallback(global.glfwWindow, cast(GLFWkeyfun)&keyCallbackFunc);
 		glfwSetCharCallback(global.glfwWindow, cast(GLFWcharfun)&characterCallbackFunc);

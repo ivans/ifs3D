@@ -4222,8 +4222,8 @@ alias PFNGLGETFINALCOMBINERINPUTPARAMETERIVNVPROC = void function(GLenum variabl
 /* GL_NV_fragment_program */
 alias PFNGLPROGRAMNAMEDPARAMETER4FNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 alias PFNGLPROGRAMNAMEDPARAMETER4DNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLdouble x, GLdouble y, GLdouble z, GLdouble w);
-alias PFNGLPROGRAMNAMEDPARAMETER4FVNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLfloat v[]);
-alias PFNGLPROGRAMNAMEDPARAMETER4DVNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLdouble v[]);
+alias PFNGLPROGRAMNAMEDPARAMETER4FVNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLfloat[] v);
+alias PFNGLPROGRAMNAMEDPARAMETER4DVNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLdouble[] v);
 alias PFNGLGETPROGRAMNAMEDPARAMETERFVNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLfloat *params);
 alias PFNGLGETPROGRAMNAMEDPARAMETERDVNVPROC = void function(GLuint id, GLsizei len, GLubyte *name, GLdouble *params);
 

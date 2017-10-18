@@ -1,7 +1,7 @@
 ﻿module ivan.ifs3d.writetga;
 
-import std.c.stdio, std.stdio;
-import std.c.stdlib;
+import core.stdc.stdio, std.stdio;
+import core.stdc.stdlib;
 import deimos.glfw.glfw3, gl;
 import freeimage;
 
@@ -26,7 +26,7 @@ GLint gltWriteTGA(char* szFileName) {
 	TGAHEADER tgaHeader; // TGA file header
 	uint lImageSize; // Size in bytes of image
 	GLbyte* pBits = null; // Pointer to bits
-	GLint iViewport[4]; // Viewport in pixels
+	GLint[4] iViewport; // Viewport in pixels
 	GLenum lastBuffer; // Storage for the current read buffer setting
 
 	// Get the viewport dimensions
@@ -117,7 +117,7 @@ RGBQUAD* getColor(float r, float g, float b) {
 GLint writeJpeg(string fileName) {
 	uint lImageSize; // Size in bytes of image
 	ubyte[] pBits; // Pointer to bits
-	GLint iViewport[4]; // Viewport in pixels
+	GLint[4] iViewport; // Viewport in pixels
 	GLenum lastBuffer; // Storage for the current read buffer setting
 
 	// Get the viewport dimensions

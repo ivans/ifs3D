@@ -1,9 +1,12 @@
 module ivan.ifs3d.transformation;
 
 private {
+	import std.array : split;
+	import std.conv : to;
+	import std.format : format;
 	import std.math;
-	import std.stream;
 	import std.stdio;
+	import std.random;
 	import deimos.glfw.glfw3, gl;
 	import ivan.ifs3d.types;
 }
@@ -42,18 +45,22 @@ class Transformation {
 		this.func = func;
 	}
 
-	this(Stream s) {
-		s.readf(&X_, &Y_, &Z_, &Wx_, &Wy_, &Wz_, &Ra_, &Rx_, &Ry_, &Rz_, &func);
+	this(string s) {
+	    auto numbers = to!(ifsfloat[])(split(s));
+		X_ = numbers[0];
+		Y_ = numbers[1];
+		Z_ = numbers[2];
+		Wx_ = numbers[3];
+		Wy_ = numbers[4];
+		Wz_ = numbers[5];
+		Ra_ = numbers[6];
+		Rx_ = numbers[7];
+		Ry_ = numbers[8];
+		Rz_ = to!int(numbers[10]);
 	}
 
-	void toStream(Stream s) {
-		s.writefln("%s %s %s %s %s %s %s %s %s %s %s", X_, Y_, Z_, Wx_, Wy_,
-				Wz_, Ra_, Rx_, Ry_, Rz_, func);
-	}
-
-	void toStreamNice(Stream s) {
-		s.writefln("--(%s %s %s) (%s %s %s) [%s %s %s %s] . %s --", X_, Y_, Z_,
-				Wx_, Wy_, Wz_, Ra_, Rx_, Ry_, Rz_, func);
+	string toStream() {
+		return format("%s %s %s %s %s %s %s %s %s %s %s", X_, Y_, Z_, Wx_, Wy_, Wz_, Ra_, Rx_, Ry_, Rz_, func);
 	}
 
 	public void draw(ifsfloat r, ifsfloat g, ifsfloat b) {

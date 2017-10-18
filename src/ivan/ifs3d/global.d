@@ -17,7 +17,7 @@ package Config conf;
 package GameLoop loop;
 package MouseState mouse;
 package Scene scene;
-package KeysState keys;
+package KeysState mykeys;
 package int clearscreen = 2;
 package ConsoleThread consoleThread;
 package GLFWwindow* glfwWindow;
@@ -30,19 +30,17 @@ package int glslCameraPosition;
 __gshared int glslFadeOffDist;
 package float fadeOffDist = 100;
 
-alias std.cstream.dout o;
-
 static this() {
 	debug writefln("global.static this()");
 	bgColor = bgColorBlack;
 }
 
 void init() {
-	debug o.writefln("Init Config...");
+	debug writefln("Init Config...");
 	conf = new Config("ifs3d_init.txt");
 	loop = new GameLoop;
 	mouse = new MouseState;
-	keys = new KeysState;
+	mykeys = new KeysState;
 	scene = new Scene;
 	//consoleThread = new ConsoleThread;
 	//consoleThread.start;
