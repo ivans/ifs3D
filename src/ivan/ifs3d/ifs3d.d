@@ -2,6 +2,7 @@ module ivan.ifs3d.ifs3d;
 
 private {
 	import std.stdio, std.string;
+	import std.file : readText;
 	import core.thread;
 	import core.stdc.string : strlen;
 	import deimos.glfw.glfw3, freeimage;
@@ -46,7 +47,7 @@ int main(string[] args) {
 
 	if(args.length == 2) {
 		debug writefln("Loading scene from file %s given as argument.", args[1]);
-		global.scene = new Scene(new std.stream.File(args[1], FileMode.In));
+		global.scene = new Scene(readText(args[1]));
 	}
 
 	global.loop.draw = {

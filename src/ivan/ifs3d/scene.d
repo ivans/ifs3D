@@ -441,8 +441,8 @@ class Scene {
 
 		// save scene definition
 		writefln("Saving scene definition file...");
-		auto File f = File(definition, "rw");
-		f.write("%s", t.toStrema());
+		File f = File(definition, "rw");
+		f.write("%s", this.toStream());
 
 		// save highres image
 		version(in_mem_buffer_with_z) {
