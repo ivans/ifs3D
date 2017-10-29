@@ -5,7 +5,8 @@
 	"authors": ["Ivan Senji"],
 	"homepage": "TODO",
 	"importPaths": ["imports"],
-	"libs": ["freeimage", "glfw", "GL", "GLU"],
+	"libs": ["GL", "freeimage", "glfw", "GLU"],
+	
 	"buildOptions": ["debugMode", "debugInfo"],
 	"dflags": ["-Jsrc/ivan/ifs3d/shaders"]
 }

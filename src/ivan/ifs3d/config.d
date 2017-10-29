@@ -72,10 +72,12 @@ class Config {
 		string key;
 		string value;
 		File f = File(fileName, "r");
-		while(f.readf("%s %s", key, value) != 0) {
+		while(f.readf("%s %s\n", key, value) != 0) {
+
+			writefln("Key = %s, value = %s", key, value);
 			intParams[key.idup] = std.conv.to!(int)(value);
 		}
-		f.write(printParams());
+		//f.write(printParams());
 		f.close();
 		return;
 	}
