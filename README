@@ -2,3 +2,6 @@
 
 Compile with:
 dub
+
+Run with (until module initialization cycle is resolved):
+./ifs3d --DRT-oncycle=ignore
