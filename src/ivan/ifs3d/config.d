@@ -63,6 +63,7 @@ class Config {
 		debug writeln("Saving config file to ", fileName);
 		File f = File(fileName, "w");
 		string params = printParams();
+		f.write(params);
 		f.close();
 		return;
 	}

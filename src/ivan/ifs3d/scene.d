@@ -443,7 +443,7 @@ class Scene {
 
 		// save scene definition
 		writefln("Saving scene definition file...");
-		File f = File(definition, "rw");
+		File f = File(definition, "w");
 		f.write("%s", this.toStream());
 
 		// save highres image
