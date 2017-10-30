@@ -33,9 +33,11 @@ class Scene {
 	this(string s) {
 		this();
 		int count;
-		s.readf(&count);
-		s.readf(&cameraPosition.x, &cameraPosition.y, &cameraPosition.z);
-		s.readf(&cameraLookAt.x, &cameraLookAt.y, &cameraLookAt.z);
+		s.formattedRead!"%d\n"(count);
+		debug writefln("Count: %s", count);
+		s.formattedRead!"%f %f %f\n"(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		s.formattedRead!"%f %f %f\n"(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
+		debug writefln("Camera: pos: %s, lookAt: %s", cameraPosition, cameraLookAt);
 
 		for(int i = 0; i < count; i++) {
 			this.addTr(new Transformation(s));

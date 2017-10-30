@@ -3,7 +3,7 @@ module ivan.ifs3d.transformation;
 private {
 	import std.array : split;
 	import std.conv : to;
-	import std.format : format;
+	import std.format : format, formattedRead;
 	import std.math;
 	import std.stdio;
 	import std.random;
@@ -45,18 +45,9 @@ class Transformation {
 		this.func = func;
 	}
 
-	this(string s) {
+	this(ref string s) {
 	    auto numbers = to!(ifsfloat[])(split(s));
-		X_ = numbers[0];
-		Y_ = numbers[1];
-		Z_ = numbers[2];
-		Wx_ = numbers[3];
-		Wy_ = numbers[4];
-		Wz_ = numbers[5];
-		Ra_ = numbers[6];
-		Rx_ = numbers[7];
-		Ry_ = numbers[8];
-		Rz_ = to!int(numbers[10]);
+	    s.formattedRead!"%f %f %f %f %f %f %f %f %f %f %d\n"(X_, Y_, Z_, Wx_, Wy_, Wz_, Ra_, Rx_, Ry_, Rz_, func);
 	}
 
 	string toStream() {

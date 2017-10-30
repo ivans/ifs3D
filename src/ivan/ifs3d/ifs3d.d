@@ -47,7 +47,9 @@ int main(string[] args) {
 
 	if(args.length == 2) {
 		debug writefln("Loading scene from file %s given as argument.", args[1]);
-		global.scene = new Scene(readText(args[1]));
+		auto fileContent = readText(args[1]);
+		debug writefln("File content: %s", fileContent);
+		global.scene = new Scene(fileContent);
 	}
 
 	global.loop.draw = {
