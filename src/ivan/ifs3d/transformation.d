@@ -51,7 +51,7 @@ class Transformation {
 	}
 
 	string toStream() {
-		return format("%s %s %s %s %s %s %s %s %s %s %s", X_, Y_, Z_, Wx_, Wy_, Wz_, Ra_, Rx_, Ry_, Rz_, func);
+		return format!"%s %s %s %s %s %s %s %s %s %s %s"(X_, Y_, Z_, Wx_, Wy_, Wz_, Ra_, Rx_, Ry_, Rz_, func);
 	}
 
 	public void draw(ifsfloat r, ifsfloat g, ifsfloat b) {

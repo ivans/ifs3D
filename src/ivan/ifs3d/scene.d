@@ -56,11 +56,11 @@ class Scene {
 	}
 
 	string toStream() {
-		string result = format("%s\n", transformations.length.to!string);
-		result ~= format("%s %s %s\n", cameraPosition.x, cameraPosition.y, cameraPosition.z);
-		result ~= format("%s %s %s\n", cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
+		string result = format!"%s\n"(transformations.length.to!string);
+		result ~= format!"%s %s %s\n"(cameraPosition.x, cameraPosition.y, cameraPosition.z);
+		result ~= format!"%s %s %s\n"(cameraLookAt.x, cameraLookAt.y, cameraLookAt.z);
 		foreach(t; transformations) {
-			result ~= t.toString;
+			result ~= format!"%s\n"(t.toStream);
 		}
 		return result;
 	}
@@ -444,7 +444,7 @@ class Scene {
 		// save scene definition
 		writefln("Saving scene definition file...");
 		File f = File(definition, "w");
-		f.write("%s", this.toStream());
+		f.write(this.toStream());
 
 		// save highres image
 		version(in_mem_buffer_with_z) {
