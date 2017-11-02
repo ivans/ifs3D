@@ -161,13 +161,15 @@ void processMouseEvents() {
 		conf.clrscr();
 	}
 
-	if(mykeys.Left == true) {
+	if(mykeys.Left == true && mykeys.old.Left == false) {
 		scene.selectPrevTransformation;
+		debug writefln("prev");
 		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
-	if(mykeys.Right == true) {
+	if(mykeys.Right == true && mykeys.old.Right == false) {
 		scene.selectNextTransformation;
+		debug writefln("next");
 		Thread.sleep(dur!("msecs")(200));
 		conf.clrscr();
 	}
@@ -247,7 +249,7 @@ void setCallbackDelegates() {
 	};
 
 	callback.keyCallback = (int key, int scancode, int action, int mods) {
-		//debug version(log_mouse_events) writefln("Key: ", key, ", ", action);
+		debug version(log_key_events) writefln("Key: %s, scancode: %s, action: %s, mods: %s", key, scancode, action, mods);
 		mykeys.update(key, action);
 	};
 
